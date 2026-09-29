@@ -4,22 +4,22 @@ import { FaStar, FaStarHalfAlt, FaGoogle, FaChevronLeft, FaChevronRight, FaQuote
 const testimonials = [
     {
         name: 'Mishra Power',
-        text: 'Working with Anna Kitchen Equipment was a seamless experience from start to finish. The team\'s professionalism and attention to detail really impressed us. Highly recommend them for anyone looking for reliable kitchen solutions.',
+        text: 'Working with AK Sales was a seamless experience from start to finish. The team\'s professionalism and attention to detail really impressed us. Highly recommend them for anyone looking for reliable kitchen solutions.',
         rating: 5,
     },
     {
         name: 'Shagufta Siddiqui',
-        text: 'We partnered with Anna Kitchen Equipments for our hotel\'s commercial kitchen setup, and the results exceeded expectations. Their industrial kitchen equipment is top-notch and built to handle heavy usage.',
+        text: 'We partnered with AK Sales for our hotel\'s commercial kitchen setup, and the results exceeded expectations. Their industrial kitchen equipment is top-notch and built to handle heavy usage.',
         rating: 5,
     },
     {
         name: 'Amit Singh',
-        text: 'Anna Kitchen offers excellent kitchen equipment with top-notch quality and reliability. Their products are perfect for both small and large-scale operations, delivering durability and efficient performance.',
+        text: 'AK Sales offers excellent kitchen equipment with top-notch quality and reliability. Their products are perfect for both small and large-scale operations, delivering durability and efficient performance.',
         rating: 5,
     },
     {
         name: 'Vibha Pandey',
-        text: 'Anna Kitchen delivered exactly what we were looking for — a modern, well-organized, and elegant kitchen. The build quality and attention to detail are truly impressive. Great choice for a reliable kitchen provider.',
+        text: 'AK Sales delivered exactly what we were looking for — a modern, well-organized, and elegant kitchen. The build quality and attention to detail are truly impressive. Great choice for a reliable kitchen provider.',
         rating: 5,
     },
 ];

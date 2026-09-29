@@ -71,7 +71,7 @@ const AboutPage = () => {
                 </h2>
                 <div className="space-y-4 text-gray-600 text-sm leading-relaxed">
                     <p>
-                        <strong className="text-secondary">Anna's Kitchen Equipment's</strong> is a premier provider of high-quality commercial and industrial kitchen equipment, dedicated to delivering innovative, durable, and cost-effective solutions for the food service industry with 14+ years of industry expertise, we have established ourselves as a trusted name in manufacturing and supplying a comprehensive range of kitchen machinery for hotels, restaurants, canteens, hospitals, and more.
+                        <strong className="text-secondary">AK Sales</strong> is a premier provider of high-quality commercial and industrial kitchen equipment, dedicated to delivering innovative, durable, and cost-effective solutions for the food service industry with 14+ years of industry expertise, we have established ourselves as a trusted name in manufacturing and supplying a comprehensive range of kitchen machinery for hotels, restaurants, canteens, hospitals, and more.
                     </p>
                 </div>
 
@@ -90,7 +90,7 @@ const AboutPage = () => {
                     Why Choose Us ?
                 </h2>
                 <p className="text-gray-600 text-sm leading-relaxed mb-6">
-                    Leading brands and businesses choose Anna's Kitchen for our commitment to quality, performance, and customer satisfaction.
+                    Leading brands and businesses choose AK Sales for our commitment to quality, performance, and customer satisfaction.
                 </p>
                 <div className="space-y-5 text-gray-600 text-sm leading-relaxed">
                     <div>
@@ -123,10 +123,10 @@ const AboutPage = () => {
                     to="/collections"
                     className="text-primary text-sm font-semibold hover:underline"
                 >
-                    Explore Anna Kitchen Products or Shop by Brand
+                    Explore AK Sales Products or Shop by Brand
                 </Link>
                 <span className="text-gray-300">|</span>
-                <a href="/anna-kitchen-broucher.pdf" download className="text-primary text-sm font-semibold hover:underline">
+                <a href="/ak-sales-brochure.pdf" download className="text-primary text-sm font-semibold hover:underline">
                     Download Brochure
                 </a>
             </div>

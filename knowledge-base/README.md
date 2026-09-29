@@ -1,5 +1,5 @@
-# Anna Kitchen Equipments
-> Marketing and catalogue site for a commercial kitchen equipment manufacturer, with a small admin area for managing products and blog posts.
+# AK Sales
+> Catalogue site for a commercial kitchen equipment manufacturer in Surat. Formerly "Anna Kitchen Equipments" — renamed 2026-09-29.
 
 ## Tech Stack
 | Layer        | Technology                                  |
@@ -39,6 +39,10 @@ knowledge-base/        This documentation
 ```
 
 ## Critical Rules
+- **The business is "AK Sales", in Surat.** Never "Anna Kitchen" and never Lucknow.
+  `src/branding.test.js` fails the build if either returns. The only permitted traces are
+  the email `annaskitchenequipment@gmail.com` and Instagram `annas_kitchen_equipments`,
+  kept until replacements exist.
 - **`server.js` is the entry point, not `server/index.js`.** `server/index.js` deliberately
   does not call `listen()`; only `server.js` does. Adding a second `listen()` will cause
   `EADDRINUSE` on Hostinger.
@@ -56,7 +60,8 @@ knowledge-base/        This documentation
 | Key          | Value                                            |
 |--------------|--------------------------------------------------|
 | Repo         | github.com/MBKANERIYA/anna-sKitchen (default `main`) |
-| Prod URL     | Not yet deployed                                 |
+| Prod URL     | https://aksales.in (move in progress)            |
+| Old domain   | annakitchenequipment.com -> 301 to aksales.in    |
 | Deploy       | Hostinger -> Deploy Web App -> import Git repo    |
 | Previous     | Vercel (dev staging)                             |
 | DB           | MongoDB Atlas                                    |

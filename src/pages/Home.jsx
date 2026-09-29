@@ -19,7 +19,7 @@ import SEO from '../components/SEO';
 const Home = () => {
     return (
         <>
-            <SEO title="Home" description="Welcome to Anna's Kitchen. We provide premium catering and refrigeration equipment." />
+            <SEO title="Commercial Kitchen Equipment Manufacturer in Surat" description="AK Sales manufactures and supplies commercial kitchen equipment in Surat for hotels, restaurants, cafes, bakeries and cloud kitchens." />
             <Hero />
             <ClientSlider />
             <About />

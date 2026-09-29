@@ -134,10 +134,10 @@ const ProjectsPage = () => {
                     to="/collections"
                     className="text-primary text-sm font-semibold hover:underline"
                 >
-                    Explore Anna Kitchen Products or Shop by Brand
+                    Explore AK Sales Products or Shop by Brand
                 </Link>
                 <span className="text-gray-300">|</span>
-                <a href="/anna-kitchen-broucher.pdf" download className="text-primary text-sm font-semibold hover:underline">
+                <a href="/ak-sales-brochure.pdf" download className="text-primary text-sm font-semibold hover:underline">
                     Download Brochure
                 </a>
             </div>

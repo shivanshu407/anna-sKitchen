@@ -52,12 +52,12 @@ const Footer = () => {
                                 A
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold font-heading">Anna Kitchen</h3>
+                                <h3 className="text-lg font-bold font-heading">AK Sales</h3>
                                 <p className="text-[10px] text-white/50 uppercase tracking-wider">Equipments</p>
                             </div>
                         </div>
                         <p className="text-white/60 text-sm leading-relaxed mb-6">
-                            Anna Kitchen Equipments — a leading Commercial Kitchen Equipment Manufacturer Company in Surat with Commercial Kitchen Planning & Setup for hotel, restaurant, cafe, food court etc.
+                            AK Sales — a leading Commercial Kitchen Equipment Manufacturer Company in Surat with Commercial Kitchen Planning & Setup for hotel, restaurant, cafe, food court etc.
                         </p>
                         <div className="space-y-3">
                             <a href="tel:+919106780688" className="flex items-center gap-3 text-white/60 text-sm hover:text-accent transition-colors">
@@ -147,7 +147,7 @@ const Footer = () => {
             <div className="border-t border-white/10">
                 <div className="max-w-7xl mx-auto px-4 py-5 flex flex-col md:flex-row items-center justify-between gap-3">
                     <p className="text-white/40 text-sm">
-                        © {new Date().getFullYear()} Anna Kitchen Equipments. All rights reserved.
+                        © {new Date().getFullYear()} AK Sales. All rights reserved.
                     </p>
                     <div className="flex items-center gap-4 text-white/40 text-sm">
                         <a href="#" className="hover:text-accent transition-colors">Privacy Policy</a>

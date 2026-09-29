@@ -133,3 +133,33 @@ uploads. Verify those with `/api/health` after deploying.
 - [architecture.md](architecture.md) — how the pieces fit together
 - [assets.md](assets.md) — why the asset filenames changed
 - [known-issues.md](known-issues.md) — read before making the site public
+
+## Moving to aksales.in (2026-09-29)
+The site is being moved from annakitchenequipment.com to **aksales.in**. The redirect is done
+in Hostinger, not in the app (owner's choice). **Order matters** — the app currently runs *on*
+the old domain, so the new one must work before anyone is sent to it.
+
+1. **Deploy the app on aksales.in** — hPanel → Websites → Add Website → Deploy Web App →
+   import `MBKANERIYA/anna-sKitchen`. Same settings as before: Node 22, build
+   `npm run build`, entry `server.js`, output `dist`.
+2. **Set the environment variables again.** They belong to the app, not the account, so a new
+   app starts with none: `MONGODB_URI`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`,
+   `CLOUDINARY_API_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `SESSION_SECRET`.
+   Without the admin three, the dashboard refuses every login (fails closed, 503).
+3. **Check it works** — `https://aksales.in/api/health` must say `"db":"connected"`. If it says
+   `disconnected`, the new server's IP is probably not allowed in MongoDB Atlas → Network Access.
+4. **Only then redirect the old domain** — hPanel → Domains → Redirects, source
+   annakitchenequipment.com, destination https://aksales.in, type **301 (permanent)**. Never
+   302: a temporary redirect tells Google to keep ranking the old domain.
+5. **Test that paths survive.** `annakitchenequipment.com/collections/refrigeration` must land on
+   `aksales.in/collections/refrigeration`, not the homepage. If hPanel's form only redirects to
+   the homepage, the path-preserving `.htaccess` rule in Hostinger's docs is the fallback:
+   `RewriteRule ^(.*)$ https://aksales.in/$1 [R=301,L]`.
+6. **Google Search Console** — verify aksales.in, then use *Change of Address* on the old
+   property. **Verify both domains by DNS**, not the HTML meta tag in `index.html`: once the old
+   domain only serves redirects, a meta-tag verification of it quietly lapses, and Change of
+   Address needs both properties verified.
+7. **Keep the old domain and the redirect for at least a year.** Google Analytics needs no
+   change; the same measurement ID works on either domain.
+
+The app code contains no hard-coded domain, so nothing in the repo changes for the move.

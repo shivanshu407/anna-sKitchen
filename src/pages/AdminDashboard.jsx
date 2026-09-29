@@ -215,7 +215,7 @@ const AdminDashboard = () => {
             <aside className="w-64 bg-secondary/40 backdrop-blur-md border-r border-white/5 text-white hidden md:block shadow-2xl relative z-10">
                 <div className="p-6 border-b border-white/5">
                     <h2 className="text-2xl font-bold font-heading text-accent">Admin Panel</h2>
-                    <p className="text-sm text-gray-400 mt-1">Anna's Kitchen</p>
+                    <p className="text-sm text-gray-400 mt-1">AK Sales</p>
                 </div>
                 <nav className="mt-6 flex flex-col gap-2 px-4">
                     <button

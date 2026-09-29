@@ -9,12 +9,12 @@ import {
 describe('buildWhatsAppMessage', () => {
     it('lays the enquiry out as labelled lines under the intro', () => {
         const msg = buildWhatsAppMessage({
-            intro: "Hi Anna Kitchen, I'd like a quote.",
+            intro: "Hi AK Sales, I'd like a quote.",
             fields: { Name: 'Ravi', 'Contact No.': '9876543210' },
         });
 
         expect(msg).toBe(
-            "Hi Anna Kitchen, I'd like a quote.\n\nName: Ravi\nContact No.: 9876543210"
+            "Hi AK Sales, I'd like a quote.\n\nName: Ravi\nContact No.: 9876543210"
         );
     });
 

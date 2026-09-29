@@ -1,11 +1,11 @@
-// All product categories and their items for Anna Kitchen Equipments
+// All product categories and their items for AK Sales
 
 const defaultProductsData = {
     'bakery-products': {
         title: 'BAKERY PRODUCTS',
         slug: 'bakery-products',
         description:
-            "Exceptional Baking Starts With The Right Tools. At Anna's Kitchen Equipments, We Provide High-Quality Bakery Equipment For Professional And Home Bakers, Ensuring Consistent, Delicious Results.",
+            "Exceptional Baking Starts With The Right Tools. At AK Sales, We Provide High-Quality Bakery Equipment For Professional And Home Bakers, Ensuring Consistent, Delicious Results.",
         products: [
             { name: 'Bengali Sweet Counter', image: '/images/bakery-product/bengali-sweet-counter.webp' },
             { name: 'Bread Oven', image: '/images/bakery-product/bread-oven.webp' },

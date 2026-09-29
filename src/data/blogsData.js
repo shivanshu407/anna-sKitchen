@@ -5,7 +5,7 @@ const defaultBlogsData = [
         image: '/blog/download.webp',
         date: 'Jan 15, 2025',
         category: 'Guide',
-        author: 'Anna Kitchen Team',
+        author: 'AK Sales Team',
         content: [
             {
                 heading: 'Why Choosing the Right Kitchen Equipment Matters',
@@ -17,11 +17,11 @@ const defaultBlogsData = [
             },
             {
                 heading: 'Benefits of Buying Locally',
-                text: 'Purchasing from a local manufacturer like Anna Kitchen Equipments offers several advantages. You get personalized consultation, faster delivery, on-site installation support, and reliable after-sales service. Local manufacturers understand regional requirements and can tailor solutions that meet your specific needs while keeping costs manageable.',
+                text: 'Purchasing from a local manufacturer like AK Sales offers several advantages. You get personalized consultation, faster delivery, on-site installation support, and reliable after-sales service. Local manufacturers understand regional requirements and can tailor solutions that meet your specific needs while keeping costs manageable.',
             },
             {
-                heading: 'Anna Kitchen Equipments - Your Local Partner',
-                text: 'Based in Surat, Anna Kitchen Equipments has been serving the hospitality industry for over 25 years. We manufacture a comprehensive range of commercial kitchen equipment including cooking ranges, refrigeration units, bakery equipment, food preparation tools, display counters, and much more. Our commitment to quality and customer satisfaction has made us a trusted name in the industry.',
+                heading: 'AK Sales - Your Local Partner',
+                text: 'Based in Surat, AK Sales has been serving the hospitality industry for over 25 years. We manufacture a comprehensive range of commercial kitchen equipment including cooking ranges, refrigeration units, bakery equipment, food preparation tools, display counters, and much more. Our commitment to quality and customer satisfaction has made us a trusted name in the industry.',
             },
         ],
     },
@@ -31,7 +31,7 @@ const defaultBlogsData = [
         image: '/blog/images-4.webp',
         date: 'Feb 02, 2025',
         category: 'Essentials',
-        author: 'Anna Kitchen Team',
+        author: 'AK Sales Team',
         content: [
             {
                 heading: 'The Foundation of Every Great Kitchen',
@@ -57,7 +57,7 @@ const defaultBlogsData = [
         image: '/blog/istockphoto-471711877-612x612.webp',
         date: 'Mar 10, 2025',
         category: 'Buying Guide',
-        author: 'Anna Kitchen Team',
+        author: 'AK Sales Team',
         content: [
             {
                 heading: 'Why a Commercial Dishwasher is Essential',
@@ -83,7 +83,7 @@ const defaultBlogsData = [
         image: '/blog/professional-stainless-steel-kitchen-design-photo-was-made-restouraunt-613910-12332.webp',
         date: 'Apr 05, 2025',
         category: 'Solutions',
-        author: 'Anna Kitchen Team',
+        author: 'AK Sales Team',
         content: [
             {
                 heading: 'Surat Growing Hospitality Industry',
@@ -98,8 +98,8 @@ const defaultBlogsData = [
                 text: 'Every food business has unique requirements. A restaurant needs different equipment compared to a hospital canteen or a bakery. Custom kitchen solutions take into account your menu, volume, available space, budget, and operational workflow to create a kitchen that works perfectly for your specific needs.',
             },
             {
-                heading: 'Why Choose Anna Kitchen Equipments',
-                text: 'With over 25 years of experience and 100+ successful projects across 16+ states, Anna Kitchen Equipments is the most trusted commercial kitchen solution provider in Surat. We combine world-class manufacturing with local expertise to deliver kitchens that exceed expectations. Our clients include Ramada, Radisson, Taj, and many more prestigious brands.',
+                heading: 'Why Choose AK Sales',
+                text: 'With over 25 years of experience and 100+ successful projects across 16+ states, AK Sales is the most trusted commercial kitchen solution provider in Surat. We combine world-class manufacturing with local expertise to deliver kitchens that exceed expectations. Our clients include Ramada, Radisson, Taj, and many more prestigious brands.',
             },
         ],
     },

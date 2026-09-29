@@ -124,3 +124,37 @@ apple-touch icon keeps the charcoal background.
   source's own charcoal looks deliberate and matches the original artwork.
 **Consequences**: The logo is reproducible from the repo. The favicon is faint on white tabs
 (ISSUE-009). A new logo later means re-running one script and changing one path.
+
+## Decision: Rebrand to "AK Sales", Surat, domain aksales.in
+**Date**: 2026-09-29
+**Status**: Accepted
+**Context**: After adopting the AK Sales logo the owner renamed the business and bought
+aksales.in. The site said "Anna Kitchen" in eight different spellings across ~20 files, and
+its search title named the wrong city.
+**Decision** (owner's choices, from a structured question):
+- Written as **"AK Sales"** in text; the logo keeps its all-caps styling.
+- City is **Surat** everywhere. The old title and meta description said Lucknow, contradicting
+  the address, map and 35 other mentions.
+- **Email and Instagram kept for now** (ISSUE-011) so customer messages keep arriving.
+- **Redirect handled in Hostinger**, not in the app.
+**Also decided, with reasons:**
+- *Ordered, case-sensitive replacement, then line-by-line review* rather than a blind
+  find-and-replace — eight spellings would otherwise produce things like "AK Sales's".
+  Case-sensitivity is also what keeps the lowercase email and Instagram handle untouched.
+- *Home page `<SEO>` title changed from "Home"* to name the product and city. `<SEO>` replaces
+  the `index.html` title once React loads, so "Home | AK Sales" is what search engines that
+  run JavaScript would index; the Surat title in `index.html` alone would not have reached them.
+- *Testimonials updated to the new name.* Same company, renamed; flagged to the owner in case
+  the quotes are verbatim and should be left word-for-word.
+- *Brochure renamed* to `ak-sales-brochure.pdf` so the downloaded file carries the new name.
+  Its contents still show the old brand (ISSUE-010).
+- *URLs not changed*, including the `...-lucknow` blog slug (the post itself is about Surat).
+  Changing URLs during a domain move only multiplies broken links.
+- *Internal identifiers left alone*: package names, the `annakitchen` database, the
+  `annas-kitchen/` Cloudinary folder. None are visible to visitors; renaming them risks breakage
+  for no user-facing gain.
+**Alternatives Considered**: An in-app 301 redirect as a backup to Hostinger's — offered,
+declined by the owner.
+**Consequences**: A new guard test (`src/branding.test.js`) fails the build if the old name or
+Lucknow reappears. One database field and the brochure contents remain on the old brand until
+handled outside the codebase.

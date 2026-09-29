@@ -71,7 +71,7 @@ const Header = () => {
                 <Link to="/" className="flex items-center gap-2 group">
                     <img
                         src="/images/ak-sales-logo.png"
-                        alt="Anna Kitchen Equipments"
+                        alt="AK Sales"
                         className="h-14 lg:h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
                     />
                 </Link>

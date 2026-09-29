@@ -39,7 +39,7 @@ const ContactPage = () => {
         }
 
         openWhatsApp({
-            intro: 'Hi Anna Kitchen, I have an enquiry.',
+            intro: 'Hi AK Sales, I have an enquiry.',
             fields: {
                 Name: enquiry.name,
                 Mobile: enquiry.mobile,
@@ -241,7 +241,7 @@ const ContactPage = () => {
             {/* Google Map */}
             <div className="w-full h-[350px] bg-gray-200">
                 <iframe
-                    title="Anna Kitchen Equipments Location"
+                    title="AK Sales Location"
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3719.0!2d72.8!3d21.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sBhatha%2C%20Surat%2C%20Gujarat%20394510!5e0!3m2!1sen!2sin!4v1"
                     width="100%"
                     height="100%"
@@ -259,10 +259,10 @@ const ContactPage = () => {
                     to="/collections"
                     className="text-primary text-sm font-semibold hover:underline"
                 >
-                    Explore Anna Kitchen Products or Shop by Brand
+                    Explore AK Sales Products or Shop by Brand
                 </Link>
                 <span className="text-gray-300">|</span>
-                <a href="/anna-kitchen-broucher.pdf" download className="text-primary text-sm font-semibold hover:underline">
+                <a href="/ak-sales-brochure.pdf" download className="text-primary text-sm font-semibold hover:underline">
                     Download Brochure
                 </a>
             </div>

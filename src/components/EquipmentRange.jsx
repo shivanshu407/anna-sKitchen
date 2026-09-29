@@ -85,7 +85,7 @@ const EquipmentRange = () => {
                         >
                             View All Collections
                         </Link>
-                        <a href="/anna-kitchen-broucher.pdf" download className="border-2 border-primary text-primary px-7 py-3 rounded-full font-semibold hover:bg-primary hover:text-white transition-all duration-300 text-sm">
+                        <a href="/ak-sales-brochure.pdf" download className="border-2 border-primary text-primary px-7 py-3 rounded-full font-semibold hover:bg-primary hover:text-white transition-all duration-300 text-sm">
                             Download Brochure
                         </a>
                     </div>

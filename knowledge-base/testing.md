@@ -54,7 +54,9 @@ of `server/` is CommonJS — `eslint.config.js` has a matching exception.
   `AbortController`. No network access.
 
 ## Known Flaky Tests
-None outstanding — keep it that way.
+- **Server test setup, rarely (ISSUE-013).** Both `server/*.test.js` files fail at file level
+  with every test skipped; re-run is green. Cause unconfirmed. If it happens, capture
+  `npx vitest run server/ --reporter=verbose` output before re-running.
 
 Observed once on 2026-09-07: a run during heavy filesystem contention (a `git checkout`
 plus `git pull` rewriting ~200 files while Vite rebuilt `dist/`) reported one failed file

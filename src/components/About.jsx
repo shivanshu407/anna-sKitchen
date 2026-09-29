@@ -22,10 +22,10 @@ const About = () => {
                 <div className="mb-10">
                     <span className="text-primary text-sm font-bold uppercase tracking-widest">Why Choose Us</span>
                     <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-secondary mt-3 font-heading">
-                        Anna's Kitchen Equipments
+                        AK Sales
                     </h2>
                     <p className="text-gray-600 text-sm leading-relaxed mt-4 max-w-3xl">
-                        Leading brands and businesses choose Anna's Kitchen for our commitment to quality, performance, and customer satisfaction.
+                        Leading brands and businesses choose AK Sales for our commitment to quality, performance, and customer satisfaction.
                     </p>
                 </div>
 

@@ -30,7 +30,7 @@ const QuoteBar = () => {
         }
 
         openWhatsApp({
-            intro: "Hi Anna Kitchen, I'd like a quote.",
+            intro: "Hi AK Sales, I'd like a quote.",
             fields: {
                 Name: form.name,
                 'Contact No.': form.contact,

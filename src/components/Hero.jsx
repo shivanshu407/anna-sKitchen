@@ -71,7 +71,7 @@ const Hero = () => {
                                 {index === currentSlide && (
                                     <>
                                         <div className="inline-block bg-accent/90 text-secondary px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-6 animate-fadeInUp">
-                                            Anna's Kitchen Equipments
+                                            AK Sales
                                         </div>
                                         <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-3 font-heading" style={{ animationDelay: '0.2s' }}>
                                             {slide.title}

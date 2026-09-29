@@ -196,7 +196,7 @@ const ServicesPage = () => {
             {/* Why Choose Us Section */}
             <div className="max-w-5xl mx-auto px-4 py-16">
                 <div className="text-center mb-12">
-                    <span className="text-primary text-xs font-bold uppercase tracking-widest">Why Anna Kitchen Equipments?</span>
+                    <span className="text-primary text-xs font-bold uppercase tracking-widest">Why AK Sales?</span>
                     <h2 className="text-2xl md:text-3xl font-bold text-secondary mt-3 mb-6 font-heading">
                         Your Trusted Partner for <span className="text-primary">Commercial Kitchen Solutions</span>
                     </h2>
@@ -223,10 +223,10 @@ const ServicesPage = () => {
                     to="/collections"
                     className="text-primary text-sm font-semibold hover:underline"
                 >
-                    Explore Anna Kitchen Products or Shop by Brand
+                    Explore AK Sales Products or Shop by Brand
                 </Link>
                 <span className="text-gray-300">|</span>
-                <a href="/anna-kitchen-broucher.pdf" download className="text-primary text-sm font-semibold hover:underline">
+                <a href="/ak-sales-brochure.pdf" download className="text-primary text-sm font-semibold hover:underline">
                     Download Brochure
                 </a>
             </div>

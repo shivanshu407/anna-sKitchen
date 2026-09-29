@@ -137,7 +137,7 @@ const ProductDetailPage = () => {
                                 {product.name} Manufacturers in <span className="text-gray-600 font-normal">Surat</span>
                             </h2>
                             <p className="text-gray-500 text-sm leading-relaxed mb-4">
-                                Anna's Kitchen Equipments is a well-known company in Surat that makes and sells kitchen equipment. One of their top products is the {product.name}. This equipment is special because it combines advanced engineering with high-quality materials, making it a favorite for restaurants, hotels, and catering services.
+                                AK Sales is a well-known company in Surat that makes and sells kitchen equipment. One of their top products is the {product.name}. This equipment is special because it combines advanced engineering with high-quality materials, making it a favorite for restaurants, hotels, and catering services.
                             </p>
                             <button className="text-[#3b82f6] text-sm font-medium hover:underline">
                                 Read more
@@ -184,10 +184,10 @@ const ProductDetailPage = () => {
                     to="/collections"
                     className="text-secondary text-sm font-semibold hover:text-primary transition-colors"
                 >
-                    Explore Anna Kitchen Products or <span className="border-b border-secondary">Shop By Brand</span>
+                    Explore AK Sales Products or <span className="border-b border-secondary">Shop By Brand</span>
                 </Link>
                 <span className="text-gray-300">|</span>
-                <a href="/anna-kitchen-broucher.pdf" download className="text-secondary text-sm font-semibold hover:text-primary transition-colors border-b border-secondary">
+                <a href="/ak-sales-brochure.pdf" download className="text-secondary text-sm font-semibold hover:text-primary transition-colors border-b border-secondary">
                     Download Brochure
                 </a>
             </div>

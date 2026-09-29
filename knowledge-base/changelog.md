@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-09-29 — Rebrand to AK Sales (Surat) ahead of the move to aksales.in
+**What**: Every visible mention of "Anna Kitchen" in the site now says "AK Sales"; the search
+title and description name Surat; the brochure is renamed.
+**Why**: The business was renamed to match the new logo and is moving to aksales.in.
+**Impact**: Visible copy changes on every page, plus browser-tab titles and search snippets.
+WhatsApp enquiries now open with "Hi AK Sales". The brochure URL changed to
+`/ak-sales-brochure.pdf`.
+**Files Changed**: `index.html`; 20 files under `src/` (46 replacements); `src/pages/Home.jsx`
+(SEO title/description); `public/ak-sales-brochure.pdf` (renamed);
+`scripts/rebrand-db.mongosh.js` and `src/branding.test.js` (**new**); knowledge base.
+**Tests**: `src/branding.test.js` — 4 tests: no old name anywhere in shipped code (bar the two
+kept contact handles), title names AK Sales and Surat, no Lucknow in `<head>`, homepage SEO
+title is descriptive. Its detector was checked against all eight old spellings and against the
+kept handles. 88/88 passing, repeated runs.
+**Commit**: see `git log`
+
+- Replacement was ordered longest-phrasing-first and case-sensitive, then every changed line
+  reviewed; the diff is exactly 52 lines with no line-ending noise.
+- Fixed a grammar error in passing: "Anna's Kitchen Equipment's is a premier provider" became
+  "AK Sales is a premier provider".
+- Browser-verified 11 pages (home, about, services, projects, contact, collections, a category,
+  a product, blog list, a blog post, admin login): zero old-brand mentions, no Lucknow, correct
+  tab titles.
+- The live Bakery Products description is in MongoDB and still says the old name until
+  `scripts/rebrand-db.mongosh.js` is run (ISSUE-012).
+- Also recorded ISSUE-013 and corrected an earlier changelog/known-issues claim that the
+  intermittent server-test failure was a DNS timeout — that was not established.
+
 ## 2026-09-29 — Stop the test suite reaching the production database (ISSUE-008)
 **What**: Tests now run with the database and Cloudinary variables forced empty.
 **Why**: The suite was connecting to the production MongoDB cluster, and one test sends an
@@ -15,7 +43,9 @@ contact with the production cluster.
   deleted variables. Setting `''` instead holds, because dotenv never overwrites.
 - Never actually fired: the sandbox running the tests blocks DNS. Production was checked and
   is intact.
-- Also explains the intermittent "29 skipped" run — it was the DNS lookup timing out.
+- ~~Also explains the intermittent "29 skipped" run — it was the DNS lookup timing out.~~
+  **Corrected later the same day:** not established; it recurred with the database isolated
+  (ISSUE-013).
 
 ## 2026-09-29 — AK Sales logo and favicons
 **What**: Replaced the site logo with the new AK Sales artwork (background removed) and

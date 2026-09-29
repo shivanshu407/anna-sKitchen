@@ -47,7 +47,7 @@ const AdminLoginPage = () => {
             <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
                 <div className="text-center">
                     <h2 className="text-3xl font-extrabold text-secondary font-heading mb-2">Admin Portal</h2>
-                    <p className="text-sm text-gray-medium">Sign in to manage Anna's Kitchen</p>
+                    <p className="text-sm text-gray-medium">Sign in to manage AK Sales</p>
                 </div>
             </div>
 

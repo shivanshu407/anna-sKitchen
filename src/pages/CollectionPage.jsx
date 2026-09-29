@@ -203,7 +203,7 @@ const CollectionPage = () => {
                         </span>
                         <div className="w-px h-4 bg-white/10" />
                         <span className="font-heading font-semibold text-accent/60 tracking-wide text-sm">
-                            Anna's Kitchen Equipments
+                            AK Sales
                         </span>
                     </div>
                 </div>

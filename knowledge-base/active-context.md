@@ -1,18 +1,25 @@
 ## Current Status
 **Last Updated**: 2026-09-29
-**Last Agent Session**: Replaced the logo with the AK Sales artwork and generated favicons;
-found and fixed the test suite connecting to the production database (ISSUE-008).
-**Test Suite Status**: 84/84 passing (three consecutive runs). Lint: 6 pre-existing problems.
+**Last Agent Session**: Rebranded the site from Anna Kitchen Equipments to AK Sales (Surat)
+and prepared the move to aksales.in. Earlier: AK Sales logo and favicons; stopped the test
+suite reaching the production database.
+**Test Suite Status**: 88/88 passing. One unexplained intermittent setup failure (ISSUE-013).
+Lint: 4 pre-existing problems.
 
 ## In Progress
-Nothing in flight.
+- **Move to aksales.in** — steps in `deployment.md` → "Moving to aksales.in". Owner is doing
+  the Hostinger side. Deploy the new app and set its env vars *before* adding the redirect.
+- **Nothing is live yet.** Production still runs code from ~2026-09-07: no AK Sales logo, no
+  rebrand, and none of the owner's Google Analytics / site-verification commits.
+- **Database text** — `scripts/rebrand-db.mongosh.js` needs running by someone with Atlas
+  access (ISSUE-012).
 
 ## Blocked On
 Nothing.
 
 ## Decisions Needed
-- Whether the business name on the site should change to match the AK Sales logo. Title,
-  meta description and alt text still say "Anna Kitchen Equipments".
+- New AK Sales email and Instagram, when they exist (ISSUE-011).
+- A rebranded brochure PDF (ISSUE-010).
 - Whether a faint favicon on white tabs is acceptable (ISSUE-009).
 - Whether to compress the 16.7 MB brochure PDF (ISSUE-003) — 70% of `public/`.
 - Whether to drop `vercel.json` and `api/` now that Hostinger is the deployment target.

@@ -10,7 +10,7 @@ const CompanyStory = () => {
                         <div className="rounded-2xl overflow-hidden shadow-2xl">
                             <img
                                 src="https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&q=80"
-                                alt="Anna Kitchen Factory"
+                                alt="AK Sales Factory"
                                 className="w-full h-[400px] lg:h-[500px] object-cover"
                             />
                         </div>
@@ -36,7 +36,7 @@ const CompanyStory = () => {
                                 We are one of the leading brands specializing in the manufacturing, service, and installation of commercial kitchen setups in Surat.
                             </p>
                             <p>
-                                With a legacy spanning over <span className="text-primary font-semibold">14 years</span> in the Indian hospitality industry, the Anna Kitchen family has been synonymous with quality, innovation, and trust. Building on decades of expertise, Anna Kitchen Equipments was officially established in 2007 and is headquartered in Gujarat, India.
+                                With a legacy spanning over <span className="text-primary font-semibold">14 years</span> in the Indian hospitality industry, the AK Sales family has been synonymous with quality, innovation, and trust. Building on decades of expertise, AK Sales was officially established in 2007 and is headquartered in Gujarat, India.
                             </p>
                             <p>
                                 Today, we are proud to be one of India's foremost manufacturers and suppliers of <span className="text-primary font-semibold">commercial kitchen equipment</span>, refrigeration and bakery equipment in Surat.

@@ -141,6 +141,10 @@ variable, even an empty one.
 empty after the app loads. Verified: three consecutive full runs, 84/84, with zero contact
 with the production cluster.
 
+> **Correction (2026-09-29, later the same day):** this entry originally also claimed the
+> intermittent "2 files failed, 29 skipped" run was the DNS lookup timing out. That was not
+> established — it recurred once with the database fully isolated. See ISSUE-013.
+
 ## ISSUE-009: Favicon is faint on white browser tabs
 **Status**: Accepted Risk
 **Severity**: Low
@@ -151,4 +155,63 @@ white has very little contrast.
 **Workaround**: Dark and coloured tabs render it well.
 **Fix**: If it matters, build the favicon on the brand charcoal like `apple-touch-icon.png`
 — a one-line change to the `clear` background in `scripts/build-logo.mjs`.
+**Regression Test**: N/A.
+
+## ISSUE-010: The brochure PDF still carries the old branding
+**Status**: Open
+**Severity**: Medium
+**Discovered**: 2026-09-29
+**Symptom**: `/ak-sales-brochure.pdf` downloads under the new name, but its pages still say
+"Anna Kitchen Equipments".
+**Root Cause**: The file was renamed during the rebrand; its contents are a designed PDF that
+cannot be edited here.
+**Workaround**: None.
+**Fix**: Get a rebranded brochure from whoever designed it. **Publish it under a new filename**
+(e.g. `ak-sales-brochure-2026.pdf`) and update the six links — overwriting in place would
+serve the old PDF to returning visitors for up to 30 days (`public/` cache TTL).
+**Regression Test**: N/A.
+
+## ISSUE-011: Email address and Instagram handle still use the old name
+**Status**: Accepted Risk
+**Severity**: Low
+**Discovered**: 2026-09-29
+**Symptom**: `annaskitchenequipment@gmail.com` (6 places) and Instagram
+`annas_kitchen_equipments` (3 places) still show "anna".
+**Root Cause**: Owner's decision — no AK Sales email or Instagram exists yet, and customer
+messages must keep arriving.
+**Workaround**: None needed.
+**Fix**: When new handles exist, replace them and remove `KEPT_CONTACT_HANDLES` from
+`src/branding.test.js` so the guard covers them too.
+**Regression Test**: `src/branding.test.js` (allows exactly these two, nothing else).
+
+## ISSUE-012: One database field still says "Anna's Kitchen Equipments"
+**Status**: Open — fix written, awaiting a run against production
+**Severity**: Low
+**Discovered**: 2026-09-29
+**Symptom**: The live Bakery Products page description reads "At Anna's Kitchen Equipments,
+We Provide…". Everything else on the site says AK Sales.
+**Root Cause**: Category text lives in MongoDB, which the code rebrand cannot reach. The
+bundled fallback in `src/data/productsData.js` *is* updated, which is why local builds look
+right.
+**Workaround**: None.
+**Fix**: `scripts/rebrand-db.mongosh.js` — dry run by default, `APPLY = true` to save. Checked
+against the live API: exactly one change, idempotent, leaves the kept email alone.
+**Regression Test**: None automated (needs the live database).
+
+## ISSUE-013: Server test files occasionally fail during setup
+**Status**: Open — cause unconfirmed
+**Severity**: Low
+**Discovered**: 2026-09-29
+**Symptom**: Rarely, `npm test` reports `server/server.test.js` and
+`server/auth-routes.test.js` failed at file level with all ~30 of their tests skipped.
+Everything else passes, and an immediate re-run is green.
+**Root Cause**: Unknown. Seen twice in ~15 runs, both times on the first run after a pause.
+It is **not** the database (it recurred with `MONGODB_URI` forced empty). The best remaining
+guess is a cold start — antivirus scanning freshly built files — pushing the shared
+`beforeAll` (import the server, listen) past Vitest's 10 s hook limit, but a warm import
+takes ~0.7 s, so that needs a ~13x slowdown and is unproven.
+**Workaround**: Re-run.
+**Fix**: Not attempted — raising the timeout without evidence would hide the real cause.
+**Next time it happens:** run `npx vitest run server/ --reporter=verbose` immediately and keep
+the full output; the hook's error text is what has been missing.
 **Regression Test**: N/A.
