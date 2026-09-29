@@ -23,8 +23,14 @@ const BACKUP = join(ROOT, 'public-original');
 const APPLY = process.argv.includes('--apply');
 
 const RASTER = new Set(['.png', '.jpg', '.jpeg', '.webp', '.avif']);
-// Kept in its original format so the favicon works in every browser.
-const KEEP_FORMAT = new Set(['/images/logo.png']);
+// Brand files built by scripts/build-logo.mjs. Kept as PNG so the favicon works
+// in every browser and the paths referenced in index.html and the header stay valid.
+const KEEP_FORMAT = new Set([
+  '/images/ak-sales-logo.png',
+  '/favicon-32.png',
+  '/favicon-192.png',
+  '/apple-touch-icon.png',
+]);
 
 // Logos render small; product and hero art needs to stay crisp on retina.
 // Top-level /images/*.ext are heroes and full-bleed backgrounds, so they keep more width

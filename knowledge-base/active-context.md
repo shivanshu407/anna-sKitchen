@@ -1,10 +1,8 @@
 ## Current Status
-**Last Updated**: 2026-09-07
-**Last Agent Session**: Replaced the fake admin login with server-side authentication
-(ISSUE-001) and made all six public forms send enquiries to WhatsApp (ISSUE-006). Both
-resolved.
-**Test Suite Status**: 74/74 passing. `npm run lint` reports 6 pre-existing problems
-(ISSUE-004). Production build succeeds.
+**Last Updated**: 2026-09-29
+**Last Agent Session**: Replaced the logo with the AK Sales artwork and generated favicons;
+found and fixed the test suite connecting to the production database (ISSUE-008).
+**Test Suite Status**: 84/84 passing (three consecutive runs). Lint: 6 pre-existing problems.
 
 ## In Progress
 Nothing in flight.
@@ -13,6 +11,9 @@ Nothing in flight.
 Nothing.
 
 ## Decisions Needed
+- Whether the business name on the site should change to match the AK Sales logo. Title,
+  meta description and alt text still say "Anna Kitchen Equipments".
+- Whether a faint favicon on white tabs is acceptable (ISSUE-009).
 - Whether to compress the 16.7 MB brochure PDF (ISSUE-003) — 70% of `public/`.
 - Whether to drop `vercel.json` and `api/` now that Hostinger is the deployment target.
 

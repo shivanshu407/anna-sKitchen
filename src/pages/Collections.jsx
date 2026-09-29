@@ -116,7 +116,7 @@ const Collections = () => {
                                     {/* Image container */}
                                     <div className="relative overflow-hidden aspect-[4/3] bg-white rounded-t-2xl">
                                         <img
-                                            src={cat.products[0]?.image || '/images/logo.png'}
+                                            src={cat.products[0]?.image || '/images/ak-sales-logo.png'}
                                             alt={cat.title}
                                             className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-1000 ease-out"
                                         />

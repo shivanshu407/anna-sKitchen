@@ -14,7 +14,9 @@ let base;
 
 beforeAll(async () => {
     // No database in tests — the API must still boot and answer.
-    delete process.env.MONGODB_URI;
+    // Empty, never deleted: a deleted variable is refilled by dotenv from a
+    // local .env, which pointed these tests at the production database.
+    process.env.MONGODB_URI = '';
     const { default: app } = await import('./index.js');
     await new Promise((resolve) => {
         server = app.listen(0, resolve);
@@ -24,6 +26,14 @@ beforeAll(async () => {
 
 afterAll(async () => {
     if (server) await new Promise((resolve) => server.close(resolve));
+});
+
+describe('test isolation', () => {
+    it('never picks up a real database from a local .env', () => {
+        // One test logs in and sends DELETE /api/products/heating-range/0 to prove
+        // the route is unlocked. Against a real database that deletes a product.
+        expect(process.env.MONGODB_URI).toBe('');
+    });
 });
 
 describe('API routing', () => {
@@ -91,9 +101,25 @@ describe('static hosting', () => {
     });
 
     it('serves public/ assets with a shorter TTL, since their names are stable', async () => {
-        const res = await fetch(`${base}/images/logo.png`);
+        const res = await fetch(`${base}/images/ak-sales-logo.png`);
         expect(res.status).toBe(200);
         expect(res.headers.get('cache-control')).toBe('public, max-age=2592000');
+    });
+
+    it('points every favicon link at a real PNG', async () => {
+        // Guards two past failures: a relative favicon href that 404'd on nested
+        // routes, and a logo rename that could leave index.html pointing at nothing.
+        const html = await (await fetch(`${base}/`)).text();
+        const hrefs = [...html.matchAll(/<link[^>]+rel="(?:icon|apple-touch-icon)"[^>]*>/g)]
+            .map((m) => m[0].match(/href="([^"]+)"/)[1]);
+
+        expect(hrefs.length).toBeGreaterThanOrEqual(2);
+        for (const href of hrefs) {
+            expect(href, 'favicon hrefs must be absolute').toMatch(/^\//);
+            const res = await fetch(base + href);
+            expect(res.status, href).toBe(200);
+            expect(res.headers.get('content-type'), href).toBe('image/png');
+        }
     });
 
     it('serves a slugified WebP product image', async () => {

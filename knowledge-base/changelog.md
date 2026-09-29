@@ -1,5 +1,53 @@
 # Changelog
 
+## 2026-09-29 — Stop the test suite reaching the production database (ISSUE-008)
+**What**: Tests now run with the database and Cloudinary variables forced empty.
+**Why**: The suite was connecting to the production MongoDB cluster, and one test sends an
+authenticated `DELETE` for a real product.
+**Impact**: `npm test` can no longer touch real services regardless of what is in `.env`.
+**Files Changed**: `vitest.config.js`, `server/server.test.js`, `server/auth-routes.test.js`,
+`knowledge-base/testing.md`, `knowledge-base/known-issues.md`
+**Tests**: New "test isolation" guard. 84/84 passing on three consecutive runs, with zero
+contact with the production cluster.
+**Commit**: see `git log`
+
+- Caused by `delete process.env.MONGODB_URI` in the tests plus a real `.env`: dotenv refills
+  deleted variables. Setting `''` instead holds, because dotenv never overwrites.
+- Never actually fired: the sandbox running the tests blocks DNS. Production was checked and
+  is intact.
+- Also explains the intermittent "29 skipped" run — it was the DNS lookup timing out.
+
+## 2026-09-29 — AK Sales logo and favicons
+**What**: Replaced the site logo with the new AK Sales artwork (background removed) and
+generated favicons from it.
+**Why**: Requested by the owner.
+**Impact**: New header logo on every page. Browser tabs, bookmarks and iOS home-screen icons
+change. The old `/images/logo.png` no longer exists.
+**Files Changed**:
+- `brand/ak-sales-logo-source.jpg`, `scripts/build-logo.mjs`, `scripts/build-logo.test.mjs` — **new**
+- `public/images/ak-sales-logo.png`, `public/favicon-32.png`, `public/favicon-192.png`,
+  `public/apple-touch-icon.png` — **new**, generated
+- `public/images/logo.png` — removed (unused; in git history and `public-original/`)
+- `index.html` — three icon links replace one
+- `src/components/Header.jsx`, `EquipmentRange.jsx`, `src/pages/Collections.jsx`,
+  `AdminDashboard.jsx` — logo path
+- `scripts/optimize-assets.mjs` — `KEEP_FORMAT` lists the new brand files
+- `server/server.test.js` — asset path updated, favicon regression test added
+**Tests**: 8 new tests for background removal and band detection, plus a test that every
+favicon link in the built page is absolute and resolves to a real PNG. 84/84 passing.
+**Commit**: see `git log`
+
+- New filenames rather than overwriting: `/images/*` is cached for 30 days.
+- Background removed by deriving alpha from the red channel and un-mixing edge pixels, so
+  edges stay gold rather than carrying a dark halo. Checked visually on the header teal, on
+  white, and at 3x zoom on an edge.
+- Favicon uses the "AK" mark only; "SALES" is illegible at 32 px. Faint on white tabs
+  (ISSUE-009).
+- Verified in a browser: the header renders the new logo; all three icon links return
+  `200 image/png`.
+- The site's name, title and alt text still say "Anna Kitchen Equipments" — only the image
+  was changed.
+
 ## 2026-09-07 — Make the public forms actually send (ISSUE-006)
 **What**: All six public forms now hand off to WhatsApp with the enquiry pre-filled. The
 five duplicated "Get Quote" bars became one `QuoteBar` component.

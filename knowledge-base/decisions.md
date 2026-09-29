@@ -105,3 +105,22 @@ working fallback deploy target while the Hostinger plan question (ISSUE-005) is 
 **Consequences**: A little confusion for a newcomer, mitigated by a note in deployment.md.
 If Hostinger's framework autodetect misreads the project, `vercel.json` is the first
 suspect.
+
+## Decision: AK Sales logo — new filenames, mark-only favicon, built from a script
+**Date**: 2026-09-29
+**Status**: Accepted
+**Context**: The owner supplied a new "AK SALES" logo (gold on charcoal JPEG) to replace
+the old one site-wide and as the favicon, with the background removed.
+**Decision**: Generate every brand file from one committed source with
+`scripts/build-logo.mjs`, under new filenames. The favicon uses the "AK" mark only; the
+apple-touch icon keeps the charcoal background.
+**Alternatives Considered**:
+- *Overwrite `images/logo.png`* — rejected: `/images/*` is cached for 30 days, so returning
+  visitors would keep seeing the old logo for up to a month.
+- *Full lockup as favicon* — rejected: "SALES" is illegible at 16-32 px.
+- *Hard threshold cutout* — rejected: leaves a dark fringe on anti-aliased edges. Alpha is
+  derived from the red channel and edge pixels are un-mixed from the background instead.
+- *Transparent apple-touch icon* — rejected: iOS fills transparency with black; using the
+  source's own charcoal looks deliberate and matches the original artwork.
+**Consequences**: The logo is reproducible from the repo. The favicon is faint on white tabs
+(ISSUE-009). A new logo later means re-running one script and changing one path.

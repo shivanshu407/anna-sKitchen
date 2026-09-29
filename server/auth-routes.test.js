@@ -15,7 +15,9 @@ let server;
 let base;
 
 beforeAll(async () => {
-    delete process.env.MONGODB_URI;
+    // Empty, never deleted: a deleted variable is refilled by dotenv from a
+    // local .env, which pointed these tests at the production database.
+    process.env.MONGODB_URI = '';
     process.env.ADMIN_USERNAME = USERNAME;
     process.env.ADMIN_PASSWORD_HASH = hashPassword(PASSWORD);
     process.env.SESSION_SECRET = SECRET;

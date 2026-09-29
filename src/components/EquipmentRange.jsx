@@ -7,7 +7,7 @@ const getCategoryCoverImage = (categoryData) => {
     if (categoryData.products && categoryData.products.length > 0) {
         return categoryData.products[0].image;
     }
-    return '/images/logo.png';
+    return '/images/ak-sales-logo.png';
 };
 
 const ALLOWED_SLUGS = [

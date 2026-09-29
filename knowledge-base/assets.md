@@ -28,8 +28,14 @@ is the 16.7 MB brochure PDF.
 - **Rasters are WebP**, quality 82. Max widths: 400 px for logos (`clients/`, `partners/`,
   `images/logo.*`), 1200 px for `blog/`, 1920 px for top-level `images/*` (heroes and
   full-bleed backgrounds), 1600 px for product shots in category subfolders.
-- **`images/logo.png` stays PNG.** It is the favicon, and an indexed/palette PNG (34.5 KB)
-  beat WebP (73 KB) for this flat logo art. It is the sole entry in `KEEP_FORMAT`.
+- **Brand files are built, not optimised.** `scripts/build-logo.mjs` generates
+  `images/ak-sales-logo.png` (header), `favicon-32.png`, `favicon-192.png` and
+  `apple-touch-icon.png` from `brand/ak-sales-logo-source.jpg`. They are listed in
+  `KEEP_FORMAT` so the optimiser leaves them as PNG under their own names — renaming them
+  to WebP would break the paths in `index.html` and the header.
+- **Replacing a logo means a new filename, never an overwrite.** `/images/*` is cached for
+  30 days; overwriting in place shows returning visitors the old logo for up to a month.
+  The previous `images/logo.png` was removed for this reason when the AK Sales logo landed.
 - **Do not hand-edit `public/`.** Put new originals in `public-original/`, then re-run the
   pipeline and the reference rewriter.
 - Admin-uploaded images go to **Cloudinary**, not to `public/`, and bypass this pipeline
@@ -49,6 +55,15 @@ node scripts/audit-assets.mjs              # expect "MISSING: 0"
 overwrite the backup. Move the existing backup aside first, deliberately.
 
 ## Known gotchas
+- **Brand source lives in `brand/`, not `public-original/`.** Anything in
+  `public-original/` becomes a public asset on the next optimiser rebuild.
+- **Background removal assumes a flat background.** `build-logo.mjs` samples the four
+  corners and refuses to run if they disagree. It derives alpha from the channel with the
+  most contrast (red, for gold on charcoal) and un-mixes edge pixels, so edges keep their
+  gold instead of a dark halo. A logo on a photo or gradient needs a different approach.
+- **The favicon is the "AK" mark only.** At 16-32 px "SALES" is illegible, so the script
+  crops to the first band of artwork. On a white browser tab the pale-yellow half of the K
+  is faint — an accepted consequence of gold on transparent (ISSUE-009).
 - **The database holds its own copy of every product and blog image path.** Renaming
   anything in `public/` therefore needs a matching database migration — see
   `scripts/migrate-image-paths.mjs` and ISSUE-007. This was missed during the original

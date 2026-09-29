@@ -39,6 +39,13 @@ of `server/` is CommonJS — `eslint.config.js` has a matching exception.
 - When ISSUE-001 is fixed, every mutating API route needs an allowed case and a denied case.
 
 ## Mocks, Fakes, and Fixtures
+- **Tests must never reach real services.** `vitest.config.js` sets `MONGODB_URI` and the
+  Cloudinary variables to empty strings. The server calls dotenv at import, and dotenv fills
+  any variable that is *missing* from a local `.env` — but never overwrites one that exists,
+  even an empty one.
+- **Never `delete process.env.X` for a variable dotenv reads.** Deleting it hands dotenv an
+  empty slot to refill from `.env`. Set it to `''` instead. Doing the opposite pointed the
+  suite at production and is guarded by the "test isolation" test (ISSUE-008).
 - No database in tests. `server/server.test.js` deletes `MONGODB_URI` before importing the
   app, so Mongoose never connects and `/api/health` reports `db: "disconnected"`.
 - The app is imported and started on port `0` (ephemeral). Nothing binds a fixed port, so

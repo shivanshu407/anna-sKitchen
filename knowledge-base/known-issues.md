@@ -115,3 +115,40 @@ output, then re-run with `-- --apply`.
 **Validated**: against the live API — all 61 stored paths map cleanly, 0 unmapped, and the
 target files already return `200 image/webp` from the deployed server.
 **Regression Test**: None automated (needs a live database). The dry run is the check.
+
+## ISSUE-008: The test suite connected to the production database
+**Status**: Resolved
+**Severity**: Critical
+**Discovered**: 2026-09-29
+**Resolved**: 2026-09-29
+**Symptom**: Test runs logged `MongoDB connection error: querySrv ... cluster0.vuc4kjf` —
+the production cluster — and occasionally failed with 29 tests skipped.
+**Root Cause**: A local `.env` holding the real `MONGODB_URI` was added on 2026-09-07. The
+server calls dotenv at import. Both server test files ran `delete process.env.MONGODB_URI`
+before importing the app, which left the variable unset — and dotenv fills unset variables
+from `.env`. So the tests connected to production.
+
+This was dangerous, not merely flaky: `server/auth-routes.test.js` logs in and sends
+`DELETE /api/products/heating-range/0` to prove the route is unlocked. On any machine with
+network access, `npm test` would have deleted a real product. It did not happen only because
+the sandbox that ran the tests blocks DNS. Production was checked afterwards and is intact
+(61 products, Heating Range unchanged).
+**Workaround**: None needed now.
+**Fix**: `vitest.config.js` sets the database and Cloudinary variables to empty strings for
+every test, and the two `delete` lines became `= ''`. dotenv never overwrites an existing
+variable, even an empty one.
+**Regression Test**: `server/server.test.js` -> "test isolation" asserts `MONGODB_URI` is
+empty after the app loads. Verified: three consecutive full runs, 84/84, with zero contact
+with the production cluster.
+
+## ISSUE-009: Favicon is faint on white browser tabs
+**Status**: Accepted Risk
+**Severity**: Low
+**Discovered**: 2026-09-29
+**Symptom**: In light-mode browsers the pale-yellow half of the "AK" favicon is hard to see.
+**Root Cause**: The favicon is gold on a transparent background, as requested. Pale yellow on
+white has very little contrast.
+**Workaround**: Dark and coloured tabs render it well.
+**Fix**: If it matters, build the favicon on the brand charcoal like `apple-touch-icon.png`
+— a one-line change to the `clear` background in `scripts/build-logo.mjs`.
+**Regression Test**: N/A.

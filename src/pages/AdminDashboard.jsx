@@ -357,7 +357,7 @@ const AdminDashboard = () => {
                                                                         src={product.image}
                                                                         alt={product.name}
                                                                         className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 drop-shadow-md"
-                                                                        onError={(e) => { e.target.src = '/images/logo.png' }}
+                                                                        onError={(e) => { e.target.src = '/images/ak-sales-logo.png' }}
                                                                     />
                                                                     <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-xl"></div>
                                                                 </div>
@@ -473,10 +473,10 @@ const AdminDashboard = () => {
                                     <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 p-3 flex flex-col group hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:border-accent/40 transition-all duration-500 relative">
                                         <div className="aspect-[4/3] bg-white rounded-xl p-4 relative flex items-center justify-center overflow-hidden border border-white/20 shadow-inner">
                                             <img
-                                                src={imagePreview || '/images/logo.png'}
+                                                src={imagePreview || '/images/ak-sales-logo.png'}
                                                 alt={productName || 'Product Preview'}
                                                 className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 drop-shadow-md"
-                                                onError={(e) => { e.target.src = '/images/logo.png' }}
+                                                onError={(e) => { e.target.src = '/images/ak-sales-logo.png' }}
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-xl"></div>
                                         </div>
@@ -518,7 +518,7 @@ const AdminDashboard = () => {
                                                     src={blog.image}
                                                     alt={blog.title}
                                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                                    onError={(e) => { e.target.src = '/images/logo.png' }}
+                                                    onError={(e) => { e.target.src = '/images/ak-sales-logo.png' }}
                                                 />
                                                 <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-xl"></div>
                                             </div>
@@ -641,7 +641,7 @@ const AdminDashboard = () => {
                                                 src={blogImagePreview || "/blog/download.webp"}
                                                 alt={blogTitle || "Blog Subject"}
                                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                                onError={(e) => { e.target.src = '/images/logo.png' }}
+                                                onError={(e) => { e.target.src = '/images/ak-sales-logo.png' }}
                                             />
                                             {blogCategory && (
                                                 <div className="absolute top-4 right-4 z-20">

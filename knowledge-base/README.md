@@ -32,6 +32,7 @@ server/                Express API (CommonJS)
 api/                   Vercel serverless shim (legacy, unused on Hostinger)
 public/                Optimised, slug-named static assets — this ships
 public-original/       Pre-optimisation originals. Local backup, gitignored
+brand/                 Logo source artwork (committed, not served)
 scripts/               Asset optimisation pipeline
 deploy/                Static-hosting .htaccess fallback
 knowledge-base/        This documentation
