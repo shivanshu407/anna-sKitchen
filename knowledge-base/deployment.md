@@ -27,15 +27,10 @@ node server.js            <- Entry file; owns listen(process.env.PORT)
 `server/index.js` never calls `listen()`. That belongs to `server.js` alone, so the module
 can be imported by tests (and by the legacy Vercel shim) without binding a port.
 
-## Plan requirement — verify this first
-Hostinger's own documentation lists in-panel Node.js apps as available on **Business Web
-Hosting** and **Cloud Startup / Professional / Enterprise** plans. Premium is not listed.
-
-> ⚠️ Needs verification: this project was set up for a plan the owner described as
-> "Premium Node.js hosting". If hPanel offers no Node.js app option, either upgrade to
-> Business, or use the static fallback below.
-
-If there is no Node.js option, check hPanel -> Websites -> Add Website -> **Deploy Web App**.
+## Plan requirement
+Confirmed 2026-09-07: the account reaches hPanel → Websites → Add Website → **Deploy Web
+App**, so Node.js apps are available (ISSUE-005, resolved). Hostinger's docs list this for
+Business and Cloud plans.
 
 ## Deploying (Node.js app)
 1. **Build locally** — `npm run build`. Confirm `dist/` exists.
@@ -47,14 +42,18 @@ If there is no Node.js option, check hPanel -> Websites -> Add Website -> **Depl
 3. **Configure the app** in hPanel:
    | Setting          | Value            |
    |------------------|------------------|
-   | Node version     | 20 or 22         |
+   | Node version     | **22**           |
    | Build command    | `npm run build`  |
    | Entry file       | `server.js`      |
    | Output directory | `dist`           |
    If the framework preset is detected as a static React/Vite app, change it — this is a
-   **server** app, otherwise `/api/*` will not exist.
+   **server** app, otherwise `/api/*` will not exist. Never Node 18: Vite needs 20.19+, and
+   the first deploy failed on 18 with a misleading `@tailwindcss/oxide` "native binding"
+   error. `engines`, `.nvmrc` and `.node-version` all say so.
 4. **Set environment variables** (hPanel -> app -> Environment variables). See `.env.example`:
-   `MONGODB_URI`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
+   `MONGODB_URI`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`,
+   and the admin three — `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `SESSION_SECRET` — from
+   `npm run admin:password`. Without the admin three the dashboard refuses every login.
    Do **not** set `PORT` — Hostinger injects it.
 5. **Allow-list the server IP in MongoDB Atlas** (Network Access). This is the most common
    first-deploy failure. Symptom below.
@@ -89,7 +88,7 @@ If there is no Node.js option, check hPanel -> Websites -> Add Website -> **Depl
 
 ## Deploying by zip upload
 Git import is the recommended path, but hPanel's **Upload your files** accepts a `.zip`.
-`hostinger-upload.zip` in the project root is that bundle: 150 files, 23.3 MB, with
+`hostinger-upload.zip` in the project root is that bundle (~160 files, ~23 MB), with
 `package.json` at the **zip root** (not nested inside a folder) — Hostinger then runs
 `npm install` and the build command itself.
 
@@ -135,6 +134,9 @@ uploads. Verify those with `/api/health` after deploying.
 - [known-issues.md](known-issues.md) — read before making the site public
 
 ## Moving to aksales.in (2026-09-29)
+> Status 2026-10-01: not started. aksales.in shows a Hostinger parking page; production is
+> still annakitchenequipment.com, running `6ade621`.
+
 The site is being moved from annakitchenequipment.com to **aksales.in**. The redirect is done
 in Hostinger, not in the app (owner's choice). **Order matters** — the app currently runs *on*
 the old domain, so the new one must work before anyone is sent to it.

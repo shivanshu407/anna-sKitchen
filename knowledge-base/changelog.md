@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-10-01 — Knowledge base audit
+**What**: Brought the knowledge base back in line with the code, the remote and production.
+**Why**: Owner request. Production, the database and two owner commits had moved on without
+documentation.
+**Impact**: Documentation only.
+**Files Changed**: all of `knowledge-base/`; `seo.md` is **new**.
+**Tests**: None — documentation only. Facts were re-checked instead: 88/88 tests, lint 4
+problems, live API, live titles, both domains, and two SEO behaviours in a browser.
+**Commit**: see this commit
+
+- Production is at `6ade621` (AK logo + Analytics live); the rebrand `a55833b` is not deployed.
+- aksales.in is a Hostinger parking page; the domain move has not started.
+- ISSUE-007 marked resolved (it was fixed on 2026-09-07 but never closed). ISSUE-012 still open.
+- New: ISSUE-014 (duplicate description tags), ISSUE-015 (unused `helmet` dependency).
+- Added missing entries below for the owner's two commits, the Node version fix, the
+  database image migration and the 2026-09-07 follow-ups.
+
 ## 2026-09-29 — Rebrand to AK Sales (Surat) ahead of the move to aksales.in
 **What**: Every visible mention of "Anna Kitchen" in the site now says "AK Sales"; the search
 title and description name Surat; the brochure is renamed.
@@ -14,7 +31,7 @@ WhatsApp enquiries now open with "Hi AK Sales". The brochure URL changed to
 kept contact handles), title names AK Sales and Surat, no Lucknow in `<head>`, homepage SEO
 title is descriptive. Its detector was checked against all eight old spellings and against the
 kept handles. 88/88 passing, repeated runs.
-**Commit**: see `git log`
+**Commit**: `a55833b`
 
 - Replacement was ordered longest-phrasing-first and case-sensitive, then every changed line
   reviewed; the diff is exactly 52 lines with no line-ending noise.
@@ -37,7 +54,7 @@ authenticated `DELETE` for a real product.
 `knowledge-base/testing.md`, `knowledge-base/known-issues.md`
 **Tests**: New "test isolation" guard. 84/84 passing on three consecutive runs, with zero
 contact with the production cluster.
-**Commit**: see `git log`
+**Commit**: `6ade621` (rebased from `02648a5`)
 
 - Caused by `delete process.env.MONGODB_URI` in the tests plus a real `.env`: dotenv refills
   deleted variables. Setting `''` instead holds, because dotenv never overwrites.
@@ -65,7 +82,7 @@ change. The old `/images/logo.png` no longer exists.
 - `server/server.test.js` — asset path updated, favicon regression test added
 **Tests**: 8 new tests for background removal and band detection, plus a test that every
 favicon link in the built page is absolute and resolves to a real PNG. 84/84 passing.
-**Commit**: see `git log`
+**Commit**: `6ade621` (rebased from `02648a5`)
 
 - New filenames rather than overwriting: `/images/*` is cached for 30 days.
 - Background removed by deriving alpha from the red channel and un-mixing edge pixels, so
@@ -77,6 +94,45 @@ favicon link in the built page is absolute and resolves to a real PNG. 84/84 pas
   `200 image/png`.
 - The site's name, title and alt text still say "Anna Kitchen Equipments" — only the image
   was changed.
+
+## 2026-09-10 — Google Analytics (by MBKANERIYA)
+**What**: Added the Google Analytics 4 gtag.js snippet to `index.html`.
+**Why**: Traffic reporting.
+**Impact**: Every page loads `googletagmanager.com/gtag/js?id=G-EZE8DTQTEB`. Was not deployed
+until the production redeploy after 2026-09-29, so Analytics recorded nothing before that.
+**Files Changed**: `index.html`
+**Tests**: None added. Verified 2026-09-29 that the tag survives alongside the favicon links.
+**Commit**: `123241e`
+
+- Logged retrospectively on 2026-10-01; the commit came in without a knowledge-base entry.
+
+## 2026-09-08 — SEO metadata and Google site verification (by MBKANERIYA)
+**What**: Added `src/components/SEO.jsx` (`react-helmet-async`), per-page titles and
+descriptions, and a `google-site-verification` meta tag.
+**Why**: Search visibility and Search Console ownership.
+**Impact**: Page titles now change per route. Added dependencies `react-helmet-async` and
+`helmet` (the latter unused — ISSUE-015). Removed two unused `index` parameters, taking lint
+from 6 to 4 problems. Wrapped the app in `HelmetProvider` (`src/main.jsx`).
+**Files Changed**: `index.html`, `package.json`, `package-lock.json`, `src/components/SEO.jsx`,
+`src/main.jsx`, `src/pages/AdminDashboard.jsx`, `BlogPage.jsx`, `BlogsListPage.jsx`,
+`CollectionPage.jsx`, `Collections.jsx`, `Home.jsx`
+**Tests**: None added.
+**Commit**: `fe39aa1`
+
+- Logged retrospectively on 2026-10-01. See seo.md for how it behaves (ISSUE-014).
+
+## 2026-09-07 — Database image path migration (ISSUE-007)
+**What**: Scripts to rewrite stored image paths in MongoDB after the asset rename.
+**Why**: Every product image was broken on the live site; the database still held the
+pre-rename paths.
+**Impact**: Data only, no deploy needed.
+**Files Changed**: `scripts/migrate-image-paths.mjs`, `scripts/fix-image-paths.mongosh.js`
+(**new**), `package.json` (`db:fix-image-paths`), `.gitignore` (`backups/`)
+**Tests**: No automated test (needs the live database). The mongosh rule was checked against
+all 61 live paths: 0 disagreements with `asset-map.json`, idempotent.
+**Commit**: `f704c1b`, `859a89c`
+
+- Run by the coworker with Atlas access the same day; 61/61 images verified loading.
 
 ## 2026-09-07 — Make the public forms actually send (ISSUE-006)
 **What**: All six public forms now hand off to WhatsApp with the enquiry pre-filled. The
@@ -93,7 +149,7 @@ customer who does not press send in WhatsApp is still not recorded.
 - `src/pages/ContactPage.jsx` — quote bar replaced; long form made controlled and wired
 - `knowledge-base/forms.md` — **new**
 **Tests**: 14 new (74 total, all passing). Lint unchanged at 6 pre-existing problems.
-**Commit**: see `git log`
+**Commit**: `cfcea8b`
 
 - Chosen destination was WhatsApp, which matches how the business already operates — the
   site links to `wa.me` in several places already.
@@ -133,7 +189,7 @@ Generate them with `npm run admin:password`.
 - `knowledge-base/security.md` — **new**
 **Tests**: 39 new (60 total, all passing) across `server/auth.test.js` and
 `server/auth-routes.test.js`. Lint unchanged at 6 pre-existing problems.
-**Commit**: see `git log`
+**Commit**: `af2c3fe`
 
 - Session is an HMAC-signed token in an httpOnly, SameSite=Strict cookie. httpOnly means an
   XSS bug cannot read it; SameSite=Strict blocks CSRF without a separate token.
@@ -156,6 +212,29 @@ Every contact and quote form on the public site is inert (ISSUE-006): six forms 
 submit handler, whose submit buttons trigger a native page reload that discards the
 enquiry. Reported rather than fixed because it needs a decision on where submissions
 should go.
+
+## 2026-09-07 — Require Node 20.19+ for deployment
+**What**: `engines.node` set to `>=20.19.0`; `.nvmrc` and `.node-version` pin 22.
+**Why**: The first Hostinger deploy ran Node 18 and the build died: Vite needs 20.19+. The
+error surfaced as a misleading `@tailwindcss/oxide` "Cannot find native binding".
+**Impact**: Deploy platforms now pick a supported runtime.
+**Files Changed**: `package.json`, `package-lock.json`, `.nvmrc`, `.node-version`
+**Tests**: Full suite green; build verified.
+**Commit**: `5fcee88`
+
+- The earlier `engines.node: ">=18"` was simply wrong and is what let Hostinger choose 18.
+- The lockfile was checked and ruled out: it already carried the Linux native binaries.
+
+## 2026-09-07 — Deployment follow-ups
+**What**: Hosting tests fail loudly instead of skipping; zip bundles ignored by git; zip
+upload documented.
+**Why**: A run under filesystem contention skipped eight hosting tests silently. The upload
+zip once shipped without `src/api/` because an exclude matched at every depth.
+**Impact**: `npm test` without a build now fails with an explicit message.
+**Files Changed**: `server/server.test.js`, `.gitignore`, `knowledge-base/deployment.md`,
+`knowledge-base/testing.md`
+**Tests**: 21/21 at the time.
+**Commit**: `b9038b0`, `f790844`, `523ec93`
 
 ## 2026-09-07 — Migrate from Vercel to Hostinger + optimise assets
 **What**: Restructured the app to run as a single Hostinger Node.js process serving both

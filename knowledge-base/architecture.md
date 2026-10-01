@@ -4,7 +4,9 @@
 A React single-page application backed by a small Express API, both served by one Node
 process. The catalogue and blog content live in MongoDB Atlas, with an identical-shaped
 copy bundled into the front-end as a fallback, so the site renders fully even when the
-database is unreachable. Admin image uploads go to Cloudinary rather than local disk.
+database is unreachable. Admin image uploads go to Cloudinary rather than local disk. Writes
+are protected by server-side sessions; public enquiries are handed to WhatsApp rather than
+stored. The business trades as **AK Sales** (Surat).
 
 ## Architecture Diagram
 ```
@@ -16,8 +18,11 @@ database is unreachable. Admin image uploads go to Cloudinary rather than local 
            +--------------------------------------+
            |     node server.js  (one process)    |
            |                                      |
-           |  compression -> cors -> json         |
+           |  compression -> json -> cookieParser |
+           |  (cors in development only)          |
            |            |                         |
+           |  /api/auth/*  login, logout, me      |
+           |  requireAuth on every POST/DELETE    |
            |  /api/products  ---+                 |
            |  /api/blogs     ---+--> Mongoose ----+---> MongoDB Atlas
            |  /api/health       |                 |
@@ -30,6 +35,9 @@ database is unreachable. Admin image uploads go to Cloudinary rather than local 
 
    Fallback path: if /api/products fails or exceeds 5 s, the SPA renders
    src/data/productsData.js instead. Same shape, no network.
+
+   Enquiries never reach this server: the contact and quote forms open
+   wa.me/919106780688 with the details pre-filled (see forms.md).
 ```
 
 ## Layers & Responsibilities
@@ -42,8 +50,11 @@ database is unreachable. Admin image uploads go to Cloudinary rather than local 
 | Data access | Mongoose 8              | Schemas and queries                             |
 | Database    | MongoDB Atlas           | Categories/products, blog posts                 |
 | Media       | Cloudinary + Multer     | Admin image uploads (memory storage, no disk)   |
+| Auth        | HMAC-signed httpOnly cookie, scrypt | Admin sessions; `requireAuth` on writes (security.md) |
+| Enquiries   | `src/lib/whatsapp.js`   | Hands forms to WhatsApp; nothing stored (forms.md) |
+| SEO         | `react-helmet-async` + `index.html` | Titles, descriptions, Analytics (seo.md) |
 | Hosting     | Hostinger Node.js app   | Process supervision, TLS, restarts              |
-| Testing     | Vitest 5                | Naming rules, timeout helper, hosting contract   |
+| Testing     | Vitest 5                | Hosting contract, auth, forms, assets, branding |
 
 ## Data Flow
 **Catalogue page load.** The SPA requests `GET /api/products`. The route loads all
@@ -81,6 +92,8 @@ what keeps the app stateless enough for a restart to be free.
 | Cloudinary     | Image hosting for uploads | New uploads fail; existing images keep serving |
 | Google Fonts   | Inter + Outfit        | Falls back to system fonts                       |
 | Unsplash       | Some hero/services imagery | Those images break — hotlinked, not local   |
+| WhatsApp       | Receives every enquiry | Forms open WhatsApp but nothing arrives; no record kept |
+| Google Analytics | Traffic reporting   | Nothing visible to visitors; reports have a gap  |
 
 ## Scalability & Limits
 Traffic is expected to be small (a regional manufacturer's brochure site) and the whole
@@ -95,6 +108,9 @@ scale, and the immutable cache headers keep repeat visits cheap.
 - Do not write uploaded files to local disk — it breaks the stateless restart assumption.
 - Do not remove the bundled fallback data in `src/data/`. It is load-bearing, not leftover.
 - Do not hand-edit `public/`; it is regenerated from `public-original/`.
+- Do not add a mutating route without `requireAuth`, and keep it ahead of multer.
+- Do not write "Anna Kitchen" or "Lucknow" anywhere — `src/branding.test.js` will fail.
 
 ## Related
 - [deployment.md](deployment.md) · [assets.md](assets.md) · [decisions.md](decisions.md)
+- [security.md](security.md) · [forms.md](forms.md) · [seo.md](seo.md)

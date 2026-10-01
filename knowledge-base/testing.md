@@ -14,18 +14,25 @@
 | `npx vitest run <file>` | A single file                                       |
 
 `pretest` runs `vite build` because `server/server.test.js` asserts against the real
-`dist/` output — hashed asset names, cache headers, the SPA shell. Without a build those
-tests would skip and quietly prove nothing.
+`dist/` output — hashed asset names, cache headers, the SPA shell, favicon links. Without a
+build those tests fail with "dist/ is missing" (they used to skip silently; see changelog).
 
 In watch mode, run `npm run build` once yourself first.
 
 ## Test File Conventions
 Tests sit next to the code they cover:
-| File                          | Covers                                    |
-|-------------------------------|-------------------------------------------|
-| `scripts/slugify.test.mjs`    | Asset filename rules                      |
-| `src/api/http.test.js`        | `fetchWithTimeout` read-timeout helper    |
-| `server/server.test.js`       | Express hosting contract                  |
+| File                            | Covers                                              |
+|---------------------------------|-----------------------------------------------------|
+| `scripts/slugify.test.mjs`      | Asset filename rules                                |
+| `scripts/build-logo.test.mjs`   | Logo background removal and band detection          |
+| `src/api/http.test.js`          | `fetchWithTimeout` read-timeout helper              |
+| `src/lib/whatsapp.test.js`      | Enquiry message building, encoding, popup fallback  |
+| `src/branding.test.js`          | No old name or Lucknow; descriptive titles          |
+| `server/server.test.js`         | Hosting contract, favicons, test isolation          |
+| `server/auth.test.js`           | Hashing, session tokens, cookie flags, fail-closed  |
+| `server/auth-routes.test.js`    | 401s on writes, login flow, forged cookies, 503     |
+
+88 tests as of 2026-10-01.
 
 Discovery globs are in `vitest.config.js`. Note `server/**/*.test.js` is ESM while the rest
 of `server/` is CommonJS — `eslint.config.js` has a matching exception.
@@ -36,7 +43,10 @@ of `server/` is CommonJS — `eslint.config.js` has a matching exception.
 - The **hosting contract** in `server/index.js`: route ordering, the SPA fallback, and the
   three cache-header classes. These are what break on a new host.
 - **Degraded-mode behaviour.** The site must render without a database.
-- When ISSUE-001 is fixed, every mutating API route needs an allowed case and a denied case.
+- **Every mutating API route needs an allowed case and a denied case** —
+  `server/auth-routes.test.js` holds them; add new routes to its `MUTATIONS` list.
+- **Branding:** keep `src/branding.test.js` green; extend `KEPT_CONTACT_HANDLES` only for
+  handles the owner has explicitly chosen to keep.
 
 ## Mocks, Fakes, and Fixtures
 - **Tests must never reach real services.** `vitest.config.js` sets `MONGODB_URI` and the

@@ -38,7 +38,8 @@ opposite, and Hostinger does not guarantee `NODE_ENV=production`.
 **Context**: `public/` was 128.4 MB, with single product PNGs up to 3.9 MB. Filenames
 contained spaces, `&`, parentheses, and mixed case.
 **Decision**: WebP at quality 82 with per-role max widths, and lowercase hyphenated names.
-`images/logo.png` stays PNG as an indexed/palette image.
+`images/logo.png` stays PNG as an indexed/palette image. *(Logo part superseded 2026-09-29
+by "AK Sales logo — new filenames…" below; `logo.png` no longer exists.)*
 **Alternatives Considered**:
 - *Lossless PNG compression only* — rejected: ~50-60% saving versus 94% for the images.
 - *Keep original filenames, rely on URL encoding* — rejected: it works, but mixed case is a

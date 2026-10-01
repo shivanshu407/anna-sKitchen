@@ -1,49 +1,49 @@
 ## Current Status
-**Last Updated**: 2026-09-29
-**Last Agent Session**: Rebranded the site from Anna Kitchen Equipments to AK Sales (Surat)
-and prepared the move to aksales.in. Earlier: AK Sales logo and favicons; stopped the test
-suite reaching the production database.
-**Test Suite Status**: 88/88 passing. One unexplained intermittent setup failure (ISSUE-013).
-Lint: 4 pre-existing problems.
+**Last Updated**: 2026-10-01
+**Last Agent Session**: Knowledge base audit against code, remote and production. Before that
+(2026-09-29): AK Sales logo, test isolation fix, full rebrand to AK Sales (Surat).
+**Test Suite Status**: 88/88 passing. One unexplained, rare setup failure (ISSUE-013).
+Lint: 4 pre-existing problems (ISSUE-004).
+
+## Production, as of 2026-10-01
+- **annakitchenequipment.com** runs `6ade621`: AK Sales logo and favicons, Google Analytics,
+  owner's SEO. **The rebrand (`a55833b`) is not deployed** — the live title still says
+  "Anna Kitchen Equipments … Lucknow".
+- **aksales.in** (and www) shows a Hostinger parking page.
+- **Database**: 61 products, all image paths correct. The Bakery Products description still
+  says the old name (ISSUE-012).
 
 ## In Progress
-- **Move to aksales.in** — steps in `deployment.md` → "Moving to aksales.in". Owner is doing
-  the Hostinger side. Deploy the new app and set its env vars *before* adding the redirect.
-- **Nothing is live yet.** Production still runs code from ~2026-09-07: no AK Sales logo, no
-  rebrand, and none of the owner's Google Analytics / site-verification commits.
-- **Database text** — `scripts/rebrand-db.mongosh.js` needs running by someone with Atlas
-  access (ISSUE-012).
+- [ ] Deploy `a55833b` (the rebrand) — redeploy in hPanel or upload the current zip.
+- [ ] Move to aksales.in — `deployment.md` → "Moving to aksales.in". New app and its env vars
+      first, redirect last.
+- [ ] Run `scripts/rebrand-db.mongosh.js` (needs the coworker with Atlas access).
 
 ## Blocked On
-Nothing.
+- Hostinger and Atlas access — both are with the owner/coworker, not this machine. This
+  machine's sandbox cannot reach MongoDB at all.
 
 ## Decisions Needed
 - New AK Sales email and Instagram, when they exist (ISSUE-011).
 - A rebranded brochure PDF (ISSUE-010).
+- Whether to keep or remove the unused `helmet` dependency (ISSUE-015).
 - Whether a faint favicon on white tabs is acceptable (ISSUE-009).
-- Whether to compress the 16.7 MB brochure PDF (ISSUE-003) — 70% of `public/`.
-- Whether to drop `vercel.json` and `api/` now that Hostinger is the deployment target.
-
-## Deploying this change — REQUIRED
-The admin API **fails closed**. After deploying, the dashboard will refuse every login
-until these exist in hPanel → your app → Environment variables:
-
-1. Run `npm run admin:password` locally.
-2. Copy `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH` and `SESSION_SECRET` into hPanel.
-3. Restart the app.
-4. Check `/api/auth/me` returns 401 (not 503). 503 means the variables are missing.
-
-The public site is unaffected either way — only the admin area depends on them.
+- Rotate the MongoDB password — it was shared in plain text in chat on 2026-09-29 and is weak.
+  Never write credential values into this knowledge base: the GitHub repo is public.
 
 ## Next Steps (for the next agent session)
-1. Set the three admin variables in hPanel (above) — otherwise the dashboard is unusable.
-2. Consider ISSUE-002 (three duplicate `/api/products` fetches per page).
+1. Check production first: `/api/health`, the homepage `<title>`, and whether aksales.in is live.
+2. After the redirect is set up, verify a deep link keeps its path
+   (`annakitchenequipment.com/collections/refrigeration` → `aksales.in/collections/refrigeration`).
+3. If ISSUE-013 recurs, capture `npx vitest run server/ --reporter=verbose` before re-running.
 
 ## Do Not Touch
 - `public/` — generated output. Edit originals in `public-original/` and re-run the
-  pipeline (assets.md).
+  pipeline (assets.md). Brand files come from `scripts/build-logo.mjs`.
 - `public-original/` — the only copy of the pre-optimisation originals (~129 MB), gitignored
   and therefore **not on GitHub**. It exists on this machine only; back it up.
+- `.env` — holds the real production `MONGODB_URI`; gitignored. Never commit it, and never
+  `delete` its variables in tests (ISSUE-008).
 - The `listen()` in `server.js` — do not add another one in `server/index.js`.
 - Route order in `server/index.js` — anything registered after the `GET *` SPA fallback is
   unreachable, and `requireAuth` must stay ahead of multer on upload routes.

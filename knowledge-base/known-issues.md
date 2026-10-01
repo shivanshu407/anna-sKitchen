@@ -34,7 +34,8 @@ cache or context.
 **Status**: Accepted Risk
 **Severity**: Low
 **Discovered**: 2026-09-07
-**Symptom**: `/anna-kitchen-broucher.pdf` is a 16.7 MB download and is 70% of `public/`.
+**Symptom**: The brochure — `/ak-sales-brochure.pdf` since 2026-09-29, previously
+`/anna-kitchen-broucher.pdf` — is a 16.7 MB download and is 70% of `public/`.
 **Root Cause**: Never compressed. No PDF tooling (Ghostscript/qpdf) on the dev machine.
 **Workaround**: It is only fetched on click, so it does not affect page load.
 **Fix**: Not done. Compressing it would cut `public/` from 23.6 MB to roughly 8 MB.
@@ -44,11 +45,11 @@ cache or context.
 **Status**: Open
 **Severity**: Low
 **Discovered**: 2026-09-07
-**Symptom**: `npm run lint` reports 4 errors and 2 warnings.
-**Root Cause**: Unused `index` parameters in `src/pages/AdminDashboard.jsx:320` and
-`src/pages/Collections.jsx:101`; an unused `e` in `server/routes/blogs.js:57`; a
-`set-state-in-effect` error and two `exhaustive-deps` warnings in
-`src/components/Header.jsx` and `src/pages/AdminDashboard.jsx`.
+**Symptom**: `npm run lint` reports 2 errors and 2 warnings (it was 4 + 2 until the owner's
+2026-09-08 commit removed two unused `index` parameters).
+**Root Cause** (as of 2026-10-01): an unused `e` in `server/routes/blogs.js:58`; a
+`set-state-in-effect` error in `src/components/Header.jsx:64`; `exhaustive-deps` warnings
+in `src/components/Header.jsx:34` and `src/pages/AdminDashboard.jsx:50`.
 **Workaround**: None needed; none block the build.
 **Fix**: Not done — untouched by the hosting work and left alone deliberately. Note the
 count was 66 before 2026-09-07 because ESLint applied browser globals to server code; the
@@ -91,9 +92,12 @@ input.
 and the popup-blocker fallback. Browser-verified on `/contact` and `/services`.
 
 ## ISSUE-007: Database image paths were not migrated with the asset rename
-**Status**: Open — fix written, awaiting a run against production
+**Status**: Resolved
 **Severity**: High
 **Discovered**: 2026-09-07
+**Resolved**: 2026-09-07 — the coworker with Atlas access ran
+`scripts/fix-image-paths.mongosh.js`. Verified the same day: all 61 stored paths are
+slug-style WebP and every one returns `200 image/webp`. Re-checked 2026-10-01: 61/61 WebP.
 **Symptom**: On the live site every product image is broken (alt text only). Locally
 everything looked fine.
 **Root Cause**: The 2026-09-07 asset optimisation renamed every file in `public/` to
@@ -185,7 +189,8 @@ messages must keep arriving.
 **Regression Test**: `src/branding.test.js` (allows exactly these two, nothing else).
 
 ## ISSUE-012: One database field still says "Anna's Kitchen Equipments"
-**Status**: Open — fix written, awaiting a run against production
+**Status**: Open — fix written, awaiting a run against production (re-checked 2026-10-01:
+still not run)
 **Severity**: Low
 **Discovered**: 2026-09-29
 **Symptom**: The live Bakery Products page description reads "At Anna's Kitchen Equipments,
@@ -214,4 +219,33 @@ takes ~0.7 s, so that needs a ~13x slowdown and is unproven.
 **Fix**: Not attempted — raising the timeout without evidence would hide the real cause.
 **Next time it happens:** run `npx vitest run server/ --reporter=verbose` immediately and keep
 the full output; the hook's error text is what has been missing.
+**Regression Test**: N/A.
+
+## ISSUE-014: Pages with `<SEO>` carry two description meta tags
+**Status**: Open
+**Severity**: Low
+**Discovered**: 2026-10-01
+**Symptom**: On Home, Collections, a collection, Blogs, a blog post and the admin dashboard,
+the rendered `<head>` has two `<meta name="description">` tags — the site-wide one from
+`index.html` and the page's own. Verified in a browser on `/collections`.
+**Root Cause**: `react-helmet-async` only replaces tags it created; the static tag in
+`index.html` is not one of them, so Helmet adds a second rather than replacing it.
+**Workaround**: None needed for visitors. Google may choose either text for the snippet.
+**Fix**: Not done. Typically: mark the `index.html` tag `data-rh="true"` so Helmet owns it, or
+give every page an `<SEO>` and drop the static tag. Check the non-JavaScript fallback
+before choosing.
+**Regression Test**: None yet.
+
+## ISSUE-015: Unused `helmet` dependency
+**Status**: Open
+**Severity**: Low
+**Discovered**: 2026-10-01
+**Symptom**: `package.json` lists `helmet` (Express security headers), added in the owner's
+2026-09-08 SEO commit, but nothing imports it.
+**Root Cause**: Most likely added alongside `react-helmet-async` by mistake; the two are
+unrelated. ⚠️ Needs confirmation from the owner.
+**Workaround**: None needed; it only adds install time.
+**Fix**: Either remove it, or wire it into `server/index.js` deliberately — the latter
+changes response headers (CSP in particular can break the Google Analytics script and Google
+Fonts) and needs testing.
 **Regression Test**: N/A.

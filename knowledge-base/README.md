@@ -11,6 +11,8 @@
 | Database     | MongoDB Atlas (Mongoose 8)                  |
 | Media        | Cloudinary (admin uploads only)             |
 | Hosting      | Hostinger — Node.js app (see deployment.md) |
+| SEO          | `react-helmet-async` per-page tags — see seo.md |
+| Analytics    | Google Analytics 4 (`G-EZE8DTQTEB`)         |
 | Auth         | Server-side sessions — see security.md      |
 | Test Runner  | Vitest 5                                    |
 
@@ -21,7 +23,8 @@ index.html             Vite HTML template.
 vite.config.js         Build config incl. vendor chunk splitting.
 vitest.config.js       Test config.
 src/                   React front-end
-  api/                 fetch wrappers (http.js adds read timeouts)
+  api/                 fetch wrappers (http.js adds read timeouts; auth.js)
+  lib/                 whatsapp.js — builds the enquiry hand-off
   components/          Shared UI
   pages/               Route-level components
   data/                Bundled fallback catalogue + blogs
@@ -33,7 +36,8 @@ api/                   Vercel serverless shim (legacy, unused on Hostinger)
 public/                Optimised, slug-named static assets — this ships
 public-original/       Pre-optimisation originals. Local backup, gitignored
 brand/                 Logo source artwork (committed, not served)
-scripts/               Asset optimisation pipeline
+scripts/               Asset pipeline, logo build, admin-password generator,
+                       and the mongosh scripts for database migrations
 deploy/                Static-hosting .htaccess fallback
 knowledge-base/        This documentation
 ```
@@ -54,14 +58,19 @@ knowledge-base/        This documentation
   (case-sensitive); Windows is not. `Logo.webp` works locally and 404s in production.
 - `public-original/` is ~129 MB and is gitignored. It exists only on the dev machine —
   back it up separately before reinstalling the OS.
-- Env vars come from hPanel in production, not from a `.env` file.
+- Env vars come from hPanel in production, not from a `.env` file. The admin login needs
+  `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH` and `SESSION_SECRET`; without them it fails closed.
+- **`npm test` must never touch real services.** A local `.env` holds the production
+  database URI; `vitest.config.js` blanks it. Never `delete process.env.X` in a test —
+  set it to `''` (ISSUE-008).
 
 ## Quick Facts
 | Key          | Value                                            |
 |--------------|--------------------------------------------------|
 | Repo         | github.com/MBKANERIYA/anna-sKitchen (default `main`) |
-| Prod URL     | https://aksales.in (move in progress)            |
-| Old domain   | annakitchenequipment.com -> 301 to aksales.in    |
+| Prod URL     | https://annakitchenequipment.com (until the move) |
+| New domain   | https://aksales.in — Hostinger parking page as of 2026-10-01 |
+| Deployed     | `6ade621` as of 2026-10-01 — AK logo + Analytics live, rebrand (`a55833b`) not yet |
 | Deploy       | Hostinger -> Deploy Web App -> import Git repo    |
 | Previous     | Vercel (dev staging)                             |
 | DB           | MongoDB Atlas                                    |
@@ -75,6 +84,7 @@ knowledge-base/        This documentation
 | README.md          | Always first                                  |
 | deployment.md      | Before deploying or changing hosting          |
 | security.md        | Before touching the admin area or API auth    |
+| seo.md             | Before changing titles, meta tags or Analytics |
 | forms.md           | Before changing any public form or enquiry flow |
 | architecture.md    | Before touching how the app is wired          |
 | decisions.md       | Before undoing something that looks odd       |
