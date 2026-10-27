@@ -4,6 +4,7 @@ const multer = require('multer');
 const { v2: cloudinary } = require('cloudinary');
 const Category = require('../models/Product');
 const { requireAuth } = require('../auth');
+const { toCatalogue } = require('../content');
 
 // Configure Cloudinary
 cloudinary.config({
@@ -23,17 +24,7 @@ router.get('/', async (req, res) => {
         const categories = await Category.find().sort({ createdAt: 1 });
 
         // Transform to the same format the frontend expects: { slug: { title, slug, description, products } }
-        const data = {};
-        categories.forEach(cat => {
-            data[cat.slug] = {
-                title: cat.title,
-                slug: cat.slug,
-                description: cat.description,
-                products: cat.products.map(p => ({ name: p.name, image: p.image }))
-            };
-        });
-
-        res.json(data);
+        res.json(toCatalogue(categories));
     } catch (err) {
         console.error('Error fetching products:', err);
         res.status(500).json({

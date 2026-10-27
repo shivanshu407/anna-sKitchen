@@ -1,3 +1,5 @@
+import { startAutoScroll } from '../lib/auto-scroll';
+import Image from './Image';
 import { useEffect, useRef } from 'react';
 
 const partnerLogos = [
@@ -14,39 +16,7 @@ const partnerLogos = [
 const PartnerSlider = () => {
     const scrollRef = useRef(null);
 
-    useEffect(() => {
-        const container = scrollRef.current;
-        if (!container) return;
-
-        let animationId;
-        let scrollPos = 0;
-        const speed = 0.5;
-
-        const animate = () => {
-            scrollPos += speed;
-            if (scrollPos >= container.scrollWidth / 2) {
-                scrollPos = 0;
-            }
-            container.scrollLeft = scrollPos;
-            animationId = requestAnimationFrame(animate);
-        };
-
-        animationId = requestAnimationFrame(animate);
-
-        const handleMouseEnter = () => cancelAnimationFrame(animationId);
-        const handleMouseLeave = () => {
-            animationId = requestAnimationFrame(animate);
-        };
-
-        container.addEventListener('mouseenter', handleMouseEnter);
-        container.addEventListener('mouseleave', handleMouseLeave);
-
-        return () => {
-            cancelAnimationFrame(animationId);
-            container.removeEventListener('mouseenter', handleMouseEnter);
-            container.removeEventListener('mouseleave', handleMouseLeave);
-        };
-    }, []);
+    useEffect(() => startAutoScroll(scrollRef.current), []);
 
     const allPartners = [...partnerLogos, ...partnerLogos];
 
@@ -67,7 +37,10 @@ const PartnerSlider = () => {
                             className={`flex-shrink-0 rounded-xl px-8 py-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-primary/20 transition-all duration-300 flex items-center justify-center ${partner.bg ? '' : 'bg-white'}`}
                             style={{ minWidth: '180px', height: '90px', backgroundColor: partner.bg || undefined }}
                         >
-                            <img
+                            <Image
+                                loading="lazy"
+                                    sizes="150px"
+                                decoding="async"
                                 src={partner.logo}
                                 alt={partner.name}
                                 className="max-h-16 max-w-[140px] object-contain transition-all duration-300"

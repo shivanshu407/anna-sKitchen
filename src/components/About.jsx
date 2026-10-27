@@ -1,3 +1,4 @@
+import Image from './Image';
 import { FaArrowRight } from 'react-icons/fa';
 
 const highlights = [
@@ -52,7 +53,9 @@ const About = () => {
                             className="group"
                         >
                             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4 shadow-md">
-                                <img
+                                <Image
+                                    loading="lazy"
+                                    decoding="async"
                                     src={item.image}
                                     alt={item.title}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -67,7 +70,7 @@ const About = () => {
 
                 <div className="text-center mt-10">
                     <a href="/about" className="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:gap-4 transition-all duration-300 group">
-                        Read More
+                        About AK Sales
                         <FaArrowRight className="text-xs group-hover:translate-x-1 transition-transform" />
                     </a>
                 </div>

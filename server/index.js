@@ -13,6 +13,7 @@ const cookieParser = require('cookie-parser');
 const productRoutes = require('./routes/products');
 const blogRoutes = require('./routes/blogs');
 const authRoutes = require('./routes/auth');
+const { mountWeb, invalidateContent } = require('./web');
 
 const app = express();
 const DIST = path.join(__dirname, '..', 'dist');
@@ -30,6 +31,20 @@ if (process.env.NODE_ENV !== 'production') {
 }
 app.use(express.json());
 app.use(cookieParser());
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    if (req.hostname === 'www.aksales.in' || (req.hostname === 'aksales.in' && !req.secure)) {
+        return res.redirect(301, `https://aksales.in${req.originalUrl}`);
+    }
+    next();
+});
+app.use('/api', (req, res, next) => {
+    res.setHeader('X-Robots-Tag', 'noindex');
+    next();
+});
+app.use('/api/products', invalidateContent);
+app.use('/api/blogs', invalidateContent);
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -55,9 +70,13 @@ app.use('/api', (req, res) => {
 
 // Serve the built front-end. Absent during local API-only development.
 if (fs.existsSync(DIST)) {
+    app.get('/index.html', (req, res) => res.redirect(301, '/'));
+    app.get(['/anna-kitchen-broucher.pdf', '/Anna%20Kitchen%20Broucher.pdf'], (req, res) => res.redirect(301, '/ak-sales-brochure.pdf'));
     app.use(express.static(DIST, {
         index: false,
+        redirect: false,
         setHeaders(res, filePath) {
+            if (filePath.endsWith('.pdf')) res.setHeader('X-Robots-Tag', 'noindex');
             if (filePath.endsWith('.html')) {
                 res.setHeader('Cache-Control', 'no-cache');
                 return;
@@ -74,11 +93,7 @@ if (fs.existsSync(DIST)) {
         }
     }));
 
-    // Client-side routing: every non-API path renders the SPA shell.
-    app.get('*', (req, res) => {
-        res.setHeader('Cache-Control', 'no-cache');
-        res.sendFile(path.join(DIST, 'index.html'));
-    });
+    mountWeb(app, DIST);
 } else {
     console.warn('⚠️  dist/ not found — run "npm run build" to serve the front-end.');
 }

@@ -21,7 +21,8 @@ node server.js            <- Entry file; owns listen(process.env.PORT)
          +-- /api/health                 -> liveness + db state
          +-- /api/*  (unmatched)         -> JSON 404
          +-- express.static('dist')      -> hashed assets, immutable cache
-         +-- GET *                       -> dist/index.html (SPA fallback)
+         +-- robots.txt / sitemap.xml     -> crawler endpoints
+         +-- GET *                       -> route-aware SSR HTML, real 404s
 ```
 
 `server/index.js` never calls `listen()`. That belongs to `server.js` alone, so the module
@@ -33,7 +34,7 @@ App**, so Node.js apps are available (ISSUE-005, resolved). Hostinger's docs lis
 Business and Cloud plans.
 
 ## Deploying (Node.js app)
-1. **Build locally** — `npm run build`. Confirm `dist/` exists.
+1. **Build locally** — `npm run build`. Confirm both `dist/` and `dist-server/entry-server.js` exist.
 2. **Get the code to Hostinger** by one of:
    - GitHub repo (rebuilds on push) — recommended,
    - a `.zip` upload,
@@ -111,6 +112,9 @@ node server.js` against it. A bundle that merely zips without error is not a bun
 deploys.
 
 ## Static-only fallback (no Node.js on the plan)
+This is a legacy fallback only. It does not satisfy this release's server-rendered SEO
+contract, real crawler endpoints or HTTP status handling. Use the Node app for aksales.in.
+
 Upload the **contents of `dist/`** to `public_html`, then rename
 `deploy/htaccess-static-fallback` to `.htaccess` beside it. That file supplies SPA routing,
 compression, and cache headers.
@@ -142,7 +146,7 @@ in Hostinger, not in the app (owner's choice). **Order matters** — the app cur
 the old domain, so the new one must work before anyone is sent to it.
 
 1. **Deploy the app on aksales.in** — hPanel → Websites → Add Website → Deploy Web App →
-   import `MBKANERIYA/anna-sKitchen`. Same settings as before: Node 22, build
+   import `shivanshu407/anna-sKitchen`. Same settings as before: Node 22, build
    `npm run build`, entry `server.js`, output `dist`.
 2. **Set the environment variables again.** They belong to the app, not the account, so a new
    app starts with none: `MONGODB_URI`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`,
@@ -164,4 +168,57 @@ the old domain, so the new one must work before anyone is sent to it.
 7. **Keep the old domain and the redirect for at least a year.** Google Analytics needs no
    change; the same measurement ID works on either domain.
 
-The app code contains no hard-coded domain, so nothing in the repo changes for the move.
+The canonical domain is now fixed to `https://aksales.in` in `src/lib/seo.js`. The metadata, schema and sitemap all use it. Deploy this release to the new domain; use hPanel for the old-domain redirect after verification.
+
+## 2026-10-02 release and DNS handoff
+The requested repository is `shivanshu407/anna-sKitchen`; its main HEAD matched local `f767a08` before edits. Local origin still points to the previous owner's repository and was deliberately not changed. No source has been pushed and no deployment has been performed in this session.
+
+The release upload package is `output/aksales-hostinger-2026-10-02-final.zip`, with package.json at its root (507 entries, 38,942,148 bytes). It includes all public responsive assets, local fonts, `src/entry-server.jsx`, the image manifest, server modules and the existing configuration. It excludes credentials, node_modules, compiled directories and original-image backups. This source package installs and builds both bundles in a fresh extraction. The older hostinger-upload.zip and initial October 2 package predate the final checks and must not be used.
+
+Node 22, build `npm run build`, entry `server.js`, and the Node/Express preset remain required. hPanel must preserve both generated directories in the running deployment; do not serve only dist. Copy existing environment variables privately in hPanel; never put their values into Git or documentation. Do not set PORT.
+
+Observed DNS on 2026-10-02:
+
+| Domain | Current public configuration |
+|---|---|
+| aksales.in | A @ = 2.57.91.91 (Hostinger parking); NS nova.dns-parking.com and cosmos.dns-parking.com |
+| www.aksales.in | CNAME www = aksales.in |
+| Old domain | Hostinger CDN addresses; NS apollo.dns-parking.com and athena.dns-parking.com |
+
+These are observations, not a hosting destination. Since aksales.in already uses Hostinger DNS, create/connect the new Node app in hPanel first and use the exact records displayed for that app. The app origin IP cannot be determined from the old domain's CDN addresses. No nameserver change is needed merely to keep Hostinger DNS. Keep existing email records. If hPanel requires an A record, replace only the parking A with its verified value; retain CNAME www=aksales.in unless the panel supplies a different target.
+
+After the new app is verified with valid HTTPS on apex and www, configure one-hop path-and-query-preserving 301 redirects for both old-domain variants to the new apex. The application itself normalizes HTTP/www on aksales.in and trailing slashes/product casing; old-domain redirects stay in hPanel as previously agreed. Retain the old domain and TLS for at least a year. Verify both Search Console domain properties using their own DNS TXT records, submit https://aksales.in/sitemap.xml, then run Change of Address from the old property. Verification values require the owner's Search Console session; do not reuse a guessed token.
+
+References: [Hostinger Node domain connection](https://www.hostinger.com/support/how-to-connect-a-custom-domain-to-a-node-js-application/), [Google site move guidance](https://developers.google.com/search/docs/crawling-indexing/site-move-with-url-changes).
+
+## Live deployment and old-domain redirect (2026-10-02, subsequent session)
+The owner deployed the final ZIP; hPanel confirms Completed/Current. Live aksales.in home,
+collection, product and blog pages return 200; /api/health reports connected; sitemap is
+XML, robots is text, and missing pages return 404. www.aksales.in redirects to the apex.
+
+Changing the old Node app's domain left annakitchenequipment.com parked without a website
+entry. A new empty PHP/HTML entry was created on the existing Business hosting plan solely
+for redirects. Hostinger verified the already-correct apollo/athena nameservers, connected
+the domain to this entry (panel origin 82.112.229.152, www alias to the apex), and the old
+Lifetime SSL remains active. These are current observations, not values to reuse for a
+future move; CDN/resolver answers may differ.
+
+The live rule is in the OLD website's public_html/.htaccess; its source copy is
+deploy/htaccess-old-domain-redirect. Do not install it in the new app. It checks only the
+old apex/www host and captures the raw encoded path from THE_REQUEST, then sends 301 to
+https://aksales.in/<same path>. The query string is carried through automatically.
+Using REQUEST_URI with NE on this LiteSpeed host produced unescaped spaces for encoded
+product names; THE_REQUEST avoids that problem and was verified with encoded %, &, +
+and spaces. A hPanel basic redirect dropped HTTP deep-link paths, so it was removed in
+favor of this rule. The old domain's intermediate Force HTTPS routing was unforced;
+the certificate remains active and both protocols redirect directly to HTTPS aksales.in.
+The Redirects list is intentionally empty because the actual rule is in .htaccess.
+
+Live verification: 20/20 exact first-response 301/Location checks across HTTP/HTTPS,
+apex/www, homepage, collection, encoded product, blog and encoded edge paths. Four real
+destination pages return 200. Evidence: output/seo/old-domain-redirect-verification.json
+and old-domain-redirect-rule.jpg. No application logic changed in this redirect session;
+the full app suite was not rerun because it cannot exercise the remote LiteSpeed rule.
+No automated unit test added because this is hosting configuration only; the live HTTP
+checks exercise the actual behavior. Keep the old domain/SSL/entry active for at least a
+year and complete Search Console Change of Address separately.

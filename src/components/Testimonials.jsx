@@ -102,12 +102,14 @@ const Testimonials = () => {
                             <div className="flex justify-center gap-3 mt-8">
                                 <button
                                     onClick={prev}
+                                    aria-label="Previous testimonial"
                                     className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-accent hover:text-secondary hover:border-accent transition-all duration-300"
                                 >
                                     <FaChevronLeft className="text-sm" />
                                 </button>
                                 <button
                                     onClick={next}
+                                    aria-label="Next testimonial"
                                     className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-accent hover:text-secondary hover:border-accent transition-all duration-300"
                                 >
                                     <FaChevronRight className="text-sm" />

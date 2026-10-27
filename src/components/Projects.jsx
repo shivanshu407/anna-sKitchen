@@ -1,3 +1,4 @@
+import Image from './Image';
 import { FaArrowRight } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
@@ -46,7 +47,9 @@ const Projects = () => {
                             className="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer"
                         >
                             <div className="aspect-[4/5] overflow-hidden">
-                                <img
+                                <Image
+                                    loading="lazy"
+                                    decoding="async"
                                     src={project.image}
                                     alt={project.name}
                                     className="w-full h-full object-cover  group-hover:scale-110 transition-transform duration-700"

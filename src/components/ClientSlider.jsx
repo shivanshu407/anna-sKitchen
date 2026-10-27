@@ -1,3 +1,5 @@
+import { startAutoScroll } from '../lib/auto-scroll';
+import Image from './Image';
 import { useEffect, useRef } from 'react';
 
 const clientLogos = [
@@ -20,39 +22,7 @@ const clientLogos = [
 const ClientSlider = () => {
     const scrollRef = useRef(null);
 
-    useEffect(() => {
-        const container = scrollRef.current;
-        if (!container) return;
-
-        let animationId;
-        let scrollPos = 0;
-        const speed = 0.5;
-
-        const animate = () => {
-            scrollPos += speed;
-            if (scrollPos >= container.scrollWidth / 2) {
-                scrollPos = 0;
-            }
-            container.scrollLeft = scrollPos;
-            animationId = requestAnimationFrame(animate);
-        };
-
-        animationId = requestAnimationFrame(animate);
-
-        const handleMouseEnter = () => cancelAnimationFrame(animationId);
-        const handleMouseLeave = () => {
-            animationId = requestAnimationFrame(animate);
-        };
-
-        container.addEventListener('mouseenter', handleMouseEnter);
-        container.addEventListener('mouseleave', handleMouseLeave);
-
-        return () => {
-            cancelAnimationFrame(animationId);
-            container.removeEventListener('mouseenter', handleMouseEnter);
-            container.removeEventListener('mouseleave', handleMouseLeave);
-        };
-    }, []);
+    useEffect(() => startAutoScroll(scrollRef.current), []);
 
     // Duplicate logos for seamless loop
     const allLogos = [...clientLogos, ...clientLogos];
@@ -74,7 +44,10 @@ const ClientSlider = () => {
                             className="flex-shrink-0 bg-white rounded-xl px-6 py-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-primary/20 transition-all duration-300 flex items-center justify-center"
                             style={{ minWidth: '180px', height: '90px' }}
                         >
-                            <img
+                            <Image
+                                loading="lazy"
+                                    sizes="150px"
+                                decoding="async"
                                 src={client.image}
                                 alt={client.name}
                                 className="max-h-14 max-w-[150px] object-contain transition-all duration-300"

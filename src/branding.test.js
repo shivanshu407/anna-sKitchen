@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getPageInfo } from './lib/seo';
 
 // The site was renamed from "Anna Kitchen Equipments" to "AK Sales" on
 // 2026-09-29. These guard against the old name drifting back in via copied
@@ -39,7 +40,7 @@ describe('AK Sales branding', () => {
     });
 
     it('names AK Sales and Surat in the page title Google sees before JavaScript runs', () => {
-        const title = readFileSync(join(ROOT, 'index.html'), 'utf8').match(/<title>(.*?)<\/title>/)[1];
+        const title = readFileSync(join(ROOT, 'index.html'), 'utf8').match(/<title\b[^>]*>(.*?)<\/title>/)[1];
         expect(title).toContain('AK Sales');
         expect(title).toContain('Surat');
     });
@@ -52,10 +53,8 @@ describe('AK Sales branding', () => {
     });
 
     it('gives the home page a descriptive title, not just "Home"', () => {
-        // <SEO> replaces the index.html title once React loads, so this is the
-        // title search engines that run JavaScript actually index.
-        const home = readFileSync(join(ROOT, 'src/pages/Home.jsx'), 'utf8');
-        const title = home.match(/<SEO[^>]*title="([^"]+)"/)[1];
+        // The shared resolver now supplies the same title to SSR and hydration.
+        const { title } = getPageInfo('/');
         expect(title).not.toBe('Home');
         expect(title).toContain('Surat');
     });

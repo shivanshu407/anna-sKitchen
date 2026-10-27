@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
+import { Routes, Route, Outlet, useLocation } from 'react-router-dom';
 import TopBar from './components/TopBar';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -16,13 +16,16 @@ import ContactPage from './pages/ContactPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboard from './pages/AdminDashboard';
 import RequireAuth from './components/RequireAuth';
+import NotFoundPage from './pages/NotFoundPage';
+import SEO from './components/SEO';
 
 // Layout for the main website
 const MainLayout = () => {
+  const { pathname } = useLocation();
   return (
     <>
       <TopBar />
-      <Header />
+      <Header key={pathname} />
       <Outlet />
       <Footer />
     </>
@@ -31,7 +34,8 @@ const MainLayout = () => {
 
 function App() {
   return (
-    <Router>
+    <>
+      <SEO />
       <ScrollToTop />
       <div className="min-h-screen">
         <Routes>
@@ -47,6 +51,7 @@ function App() {
             <Route path="/collections/:category" element={<CollectionPage />} />
             <Route path="/collections/:category/:productName" element={<ProductDetailPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
 
           {/* Admin Routes (No Header/Footer) */}
@@ -61,7 +66,7 @@ function App() {
           />
         </Routes>
       </div>
-    </Router>
+    </>
   );
 }
 

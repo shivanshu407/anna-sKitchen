@@ -1,27 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import Image from '../components/Image';
 import { Link } from 'react-router-dom';
 import { FaHome, FaChevronRight, FaCalendar, FaArrowRight } from 'react-icons/fa';
-import { fetchBlogs } from '../api/blogs';
+import { useSiteData } from '../lib/site-data';
 import CTA from '../components/CTA';
-import SEO from '../components/SEO';
 
 const BlogsListPage = () => {
-    const [blogs, setBlogs] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const loadBlogs = async () => {
-            try {
-                const data = await fetchBlogs();
-                setBlogs(data);
-            } catch (error) {
-                console.error("Failed to fetch blogs:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadBlogs();
-    }, []);
+    const { blogs, loading } = useSiteData();
 
     if (loading) {
         return (
@@ -36,7 +20,6 @@ const BlogsListPage = () => {
 
     return (
         <div className="min-h-screen bg-gold-light">
-            <SEO title="Our Blogs" description="Insights, trends, and guides for commercial kitchen equipments." />
             {/* Hero Banner */}
             <div className="relative h-[40vh] min-h-[300px] overflow-hidden">
                 <div
@@ -78,9 +61,11 @@ const BlogsListPage = () => {
                             className="block cursor-pointer group bg-white rounded-2xl overflow-hidden shadow-lg shadow-secondary/5 border border-gray-100 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 transition-all duration-500 flex flex-col h-full"
                         >
                             <div className="relative aspect-[16/10] overflow-hidden flex-shrink-0">
-                                <img
+                                <Image
+                                    loading="lazy"
+                                    decoding="async"
                                     src={blog.image}
-                                    alt={blog.title}
+                                    alt={blog.imageAlt || blog.title}
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-secondary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -96,6 +81,11 @@ const BlogsListPage = () => {
                                 <h3 className="text-[15px] font-bold text-secondary leading-snug mb-4 line-clamp-2 group-hover:text-primary transition-colors font-heading">
                                     {blog.title}
                                 </h3>
+                                {blog.excerpt && (
+                                    <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">
+                                        {blog.excerpt}
+                                    </p>
+                                )}
 
                                 {/* Pushes the "Read More" link to the bottom so cards align nicely */}
                                 <div className="mt-auto pt-4 border-t border-gray-100">

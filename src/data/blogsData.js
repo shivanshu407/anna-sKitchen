@@ -105,8 +105,7 @@ const defaultBlogsData = [
     },
 ];
 
-const saved = localStorage.getItem('blogsData');
-const blogsData = saved ? JSON.parse(saved) : defaultBlogsData;
+const blogsData = defaultBlogsData;
 
 export const saveBlogsData = () => {
     localStorage.setItem('blogsData', JSON.stringify(blogsData));

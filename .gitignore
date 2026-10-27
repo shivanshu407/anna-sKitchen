@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+dist-server
 *.local
 server/.env
 
@@ -38,3 +39,5 @@ public-optimized
 
 # Database snapshots taken before migrations — real data, never commit
 backups/
+output/
+.playwright-cli/

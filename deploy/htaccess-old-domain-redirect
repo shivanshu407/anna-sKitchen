@@ -1,0 +1,6 @@
+# Install only in annakitchenequipment.com's redirect-only public_html.
+# Preserve the original encoded path and existing query string.
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^(www\.)?annakitchenequipment\.com(:[0-9]+)?$ [NC]
+RewriteCond %{THE_REQUEST} \s/+([^?\s]*)
+RewriteRule ^ https://aksales.in/%1 [R=301,L,NE]

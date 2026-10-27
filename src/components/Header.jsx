@@ -1,14 +1,16 @@
+import Image from './Image';
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FaBars, FaTimes, FaChevronDown, FaPhone } from 'react-icons/fa';
-import { fetchProducts } from '../api/products';
+import { useSiteData } from '../lib/site-data';
 
 const Header = () => {
     const [isScrolled, setIsScrolled] = useState(false);
-    const [mobileOpen, setMobileOpen] = useState(false);
+    const [mobileOpenPath, setMobileOpenPath] = useState(null);
     const [activeDropdown, setActiveDropdown] = useState(null);
-    const [productCategories, setProductCategories] = useState([]);
+    const { products } = useSiteData();
     const location = useLocation();
+    const mobileOpen = mobileOpenPath === location.pathname;
 
     // Only these 7 categories should appear in the header dropdown
     const HEADER_CATEGORY_SLUGS = [
@@ -21,17 +23,10 @@ const Header = () => {
         'processing',
     ];
 
-    useEffect(() => {
-        fetchProducts().then(data => {
-            const cats = HEADER_CATEGORY_SLUGS
-                .filter(slug => data[slug])
-                .map(slug => ({
-                    name: data[slug].title,
-                    slug: slug,
-                }));
-            setProductCategories(cats);
-        });
-    }, []);
+    const productCategories = HEADER_CATEGORY_SLUGS.filter(slug => products[slug]).map(slug => ({
+        name: products[slug].title,
+        slug,
+    }));
 
     const navLinks = [
         { name: 'Home', href: '/' },
@@ -60,16 +55,16 @@ const Header = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    useEffect(() => {
-        setMobileOpen(false);
-    }, [location]);
-
     return (
         <header className={`sticky top-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-secondary shadow-xl shadow-secondary/20' : 'bg-secondary/95 backdrop-blur-md'}`}>
             <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-18 lg:h-20">
                 {/* Logo */}
                 <Link to="/" className="flex items-center gap-2 group">
-                    <img
+                    <Image
+                        sizes="80px"
+                        width="400"
+                        height="324"
+                        decoding="async"
                         src="/images/ak-sales-logo.png"
                         alt="AK Sales"
                         className="h-14 lg:h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
@@ -144,7 +139,9 @@ const Header = () => {
                         Get Quote
                     </Link>
                     <button
-                        onClick={() => setMobileOpen(!mobileOpen)}
+                        onClick={() => setMobileOpenPath(mobileOpen ? null : location.pathname)}
+                        aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                        aria-expanded={mobileOpen}
                         className="lg:hidden w-10 h-10 flex items-center justify-center text-white hover:text-accent transition-colors"
                     >
                         {mobileOpen ? <FaTimes className="text-xl" /> : <FaBars className="text-xl" />}

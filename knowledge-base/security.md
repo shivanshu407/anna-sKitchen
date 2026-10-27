@@ -33,8 +33,15 @@ Never stored anywhere in plaintext. `ADMIN_PASSWORD_HASH` holds a scrypt hash
 `scrypt$<salt b64>$<key b64>`. Comparison is constant-time via `timingSafeEqual`.
 
 ## Conventions and rules
-- **Every mutating route carries `requireAuth`.** `POST`/`DELETE` on products and blogs.
-  `GET` stays public — the site needs it.
+- **Every mutating route carries `requireAuth`.** `POST`/`DELETE` on products and blogs,
+  plus (2026-10-27) `PUT /api/blogs/:slug` and `POST /api/blogs/images`. `GET` stays
+  public — the site needs it — except `GET /api/blogs?drafts=1`, which lists drafts and
+  requires a session.
+- **Blog content is allowlisted on the server** (`server/blog-input.js`): only known
+  TipTap nodes/marks survive, link hrefs are limited to http(s)/mailto/tel/site paths/
+  anchors (no `javascript:`, `//host` or `/\host`), images to Cloudinary or site paths,
+  with size and depth caps. Pages render the JSON through React, never as HTML.
+- **Blog uploads are limited**: JPEG/PNG/WebP/AVIF, 5 MB, one file per request.
 - **`requireAuth` runs before multer**, so an unauthenticated upload is rejected before the
   file is buffered into memory. Keep that order when adding upload routes.
 - **It fails closed.** If `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH` or `SESSION_SECRET` is

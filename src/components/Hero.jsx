@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import Image from './Image';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const slides = [
@@ -33,13 +34,6 @@ const categories = [
 const Hero = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
 
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentSlide((prev) => (prev + 1) % slides.length);
-        }, 5000);
-        return () => clearInterval(timer);
-    }, []);
-
     return (
         <section id="home" className="relative h-[90vh] min-h-[600px] overflow-hidden">
             {/* Background slides */}
@@ -49,13 +43,22 @@ const Hero = () => {
                     className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
                 >
                     <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} z-10`} />
-                    <div
+                    {index === 0 ? <Image
+                        src="/images/ab.webp"
+                        alt="Commercial kitchen equipment by AK Sales in Surat"
+                        width="1920"
+                        height="1080"
+                        fetchPriority="high"
+                        sizes="100vw"
+                        decoding="async"
+                        className="absolute inset-0 w-full h-full object-cover"
+                    /> : <div
                         className="absolute inset-0 bg-cover bg-center transition-transform duration-[8000ms]"
                         style={{
-                            backgroundImage: `url('https://images.unsplash.com/photo-${index === 0 ? '1556909114-f6e7ad7d3136' : index === 1 ? '1571867424488-4565932edb41' : '1600585154340-be6161a56a0c'}?w=1920&q=80')`,
+                            backgroundImage: index === currentSlide ? `url('https://images.unsplash.com/photo-${index === 1 ? '1571867424488-4565932edb41' : '1600585154340-be6161a56a0c'}?w=1920&q=80')` : undefined,
                             transform: index === currentSlide ? 'scale(1.1)' : 'scale(1)',
                         }}
-                    />
+                    />}
                 </div>
             ))}
 
@@ -73,9 +76,9 @@ const Hero = () => {
                                         <div className="inline-block bg-accent/90 text-secondary px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-6 animate-fadeInUp">
                                             AK Sales
                                         </div>
-                                        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-3 font-heading" style={{ animationDelay: '0.2s' }}>
+                                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-3 font-heading" style={{ animationDelay: '0.2s' }}>
                                             {slide.title}
-                                        </h2>
+                                        </h1>
                                         <p className="text-xl md:text-2xl text-accent font-semibold mb-4 font-heading" style={{ animationDelay: '0.4s' }}>
                                             {slide.subtitle}
                                         </p>
@@ -117,6 +120,8 @@ const Hero = () => {
                     <button
                         key={index}
                         onClick={() => setCurrentSlide(index)}
+                        aria-label={`Show slide ${index + 1}: ${slides[index].title}`}
+                        aria-pressed={index === currentSlide}
                         className={`transition-all duration-300 rounded-full ${index === currentSlide ? 'w-10 h-3 bg-accent' : 'w-3 h-3 bg-white/40 hover:bg-white/70'}`}
                     />
                 ))}

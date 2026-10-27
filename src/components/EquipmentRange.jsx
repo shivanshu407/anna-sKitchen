@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import Image from './Image';
 import { Link } from 'react-router-dom';
 import { FaArrowRight } from 'react-icons/fa';
-import { fetchProducts } from '../api/products';
+import { useSiteData } from '../lib/site-data';
 
 const getCategoryCoverImage = (categoryData) => {
     if (categoryData.products && categoryData.products.length > 0) {
@@ -21,21 +21,13 @@ const ALLOWED_SLUGS = [
 ];
 
 const EquipmentRange = () => {
-    const [equipment, setEquipment] = useState([]);
-
-    useEffect(() => {
-        fetchProducts().then(data => {
-            const items = ALLOWED_SLUGS
-                .filter(slug => data[slug])
-                .map(slug => ({
-                    name: data[slug].title,
-                    slug: slug,
-                    image: getCategoryCoverImage(data[slug]),
-                    description: data[slug].description || 'Explore our full range of products in this category.',
-                }));
-            setEquipment(items);
-        });
-    }, []);
+    const { products } = useSiteData();
+    const equipment = ALLOWED_SLUGS.filter(slug => products[slug]).map(slug => ({
+        name: products[slug].title,
+        slug,
+        image: getCategoryCoverImage(products[slug]),
+        description: products[slug].description || 'Explore our full range of products in this category.',
+    }));
 
     return (
         <section id="products" className="section-padding bg-gold-light">
@@ -56,7 +48,9 @@ const EquipmentRange = () => {
                             className="group bg-white rounded-2xl overflow-hidden shadow-md shadow-secondary/5 border border-gray-100 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 transition-all duration-500"
                         >
                             <div className="relative aspect-[4/3] overflow-hidden bg-white">
-                                <img
+                                <Image
+                                    loading="lazy"
+                                    decoding="async"
                                     src={item.image}
                                     alt={item.name}
                                     className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-700"

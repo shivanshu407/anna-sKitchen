@@ -1,15 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchProducts, addProduct, deleteProduct } from '../api/products';
-import { fetchBlogs, addBlog, deleteBlog } from '../api/blogs';
+import { fetchAllBlogsAdmin, deleteBlog } from '../api/blogs';
 import { logout } from '../api/auth';
-import { FaTrash, FaEdit } from 'react-icons/fa';
-import SEO from '../components/SEO';
+import { FaTrash, FaEdit, FaPlus } from 'react-icons/fa';
+
+// TipTap is admin-only, so the editor is split out of the public bundle.
+const BlogEditor = lazy(() => import('../components/admin/BlogEditor'));
+
+const blogDate = (blog) => {
+    const date = blog.publishedAt ? new Date(blog.publishedAt) : null;
+    if (date && !Number.isNaN(date.getTime())) {
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Kolkata' });
+    }
+    return blog.date || 'Not published yet';
+};
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('manage-products');
     const [productsData, setProductsData] = useState({});
     const [blogsData, setBlogsData] = useState([]);
+    const [blogsError, setBlogsError] = useState('');
+    // null shows the post list; { blog: null } a new post; { blog } an edit.
+    const [blogEditor, setBlogEditor] = useState(null);
     const [loading, setLoading] = useState(true);
     const [filterCategory, setFilterCategory] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
@@ -20,14 +33,6 @@ const AdminDashboard = () => {
     const [productName, setProductName] = useState('');
     const [productImage, setProductImage] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
-
-    // Blog States
-    const [blogTitle, setBlogTitle] = useState('');
-    const [blogCategory, setBlogCategory] = useState('');
-    const [blogAuthor, setBlogAuthor] = useState('');
-    const [blogImage, setBlogImage] = useState(null);
-    const [blogImagePreview, setBlogImagePreview] = useState('');
-    const [blogContent, setBlogContent] = useState('');
 
     const [successMessage, setSuccessMessage] = useState('');
     const [loggingOut, setLoggingOut] = useState(false);
@@ -52,13 +57,12 @@ const AdminDashboard = () => {
     const loadData = async () => {
         setLoading(true);
         try {
-            const [pData, bData] = await Promise.all([
+            const [pData] = await Promise.all([
                 fetchProducts(),
-                fetchBlogs()
+                loadBlogs()
             ]);
 
             setProductsData(pData);
-            setBlogsData(bData);
 
             const keys = Object.keys(pData);
             if (keys.length > 0) {
@@ -69,6 +73,16 @@ const AdminDashboard = () => {
             console.error('Failed to load data:', err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    // The admin list includes drafts and has no bundled fallback, so a failure is shown.
+    const loadBlogs = async () => {
+        try {
+            setBlogsData(await fetchAllBlogsAdmin());
+            setBlogsError('');
+        } catch (err) {
+            setBlogsError(`Could not load blog posts: ${err.message}`);
         }
     };
 
@@ -138,49 +152,10 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleAddBlog = async (e) => {
-        e.preventDefault();
-
-        if (!blogTitle || !blogContent || !blogImage) {
-            alert("Please fill in the blog title, content, and select an image.");
-            return;
-        }
-
-        const newSlug = blogTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-        const dateString = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-
-        const contentArray = [
-            {
-                heading: blogTitle,
-                text: blogContent
-            }
-        ];
-
-        try {
-            const result = await addBlog({
-                slug: newSlug,
-                title: blogTitle,
-                blogImage: blogImage,
-                date: dateString,
-                category: blogCategory || 'General',
-                author: blogAuthor || 'Admin',
-                content: contentArray
-            });
-
-            setSuccessMessage(result.message || `Successfully published blog: "${blogTitle}"!`);
-            setBlogTitle('');
-            setBlogCategory('');
-            setBlogAuthor('');
-            setBlogImage(null);
-            setBlogImagePreview('');
-            setBlogContent('');
-
-            await loadData(); // refresh blogs list
-
-        } catch (err) {
-            alert('Error adding blog: ' + err.message);
-        }
-
+    const handleBlogSaved = async (message) => {
+        setBlogEditor(null);
+        setSuccessMessage(message);
+        await loadBlogs();
         setTimeout(() => setSuccessMessage(''), 3000);
     };
 
@@ -189,13 +164,15 @@ const AdminDashboard = () => {
             try {
                 await deleteBlog(slug);
                 setSuccessMessage("Blog deleted successfully.");
-                await loadData();
+                await loadBlogs();
             } catch (err) {
-                alert('Error deleting blog: ' + err.message);
+                setBlogsError('Error deleting blog: ' + err.message);
             }
             setTimeout(() => setSuccessMessage(''), 3000);
         }
     };
+
+    const blogCategories = [...new Set(blogsData.map((blog) => blog.category).filter(Boolean))].sort();
 
     if (loading) {
         return (
@@ -210,7 +187,6 @@ const AdminDashboard = () => {
 
     return (
         <div className="min-h-screen bg-secondary flex">
-            <SEO title="Admin Dashboard" />
             {/* Sidebar */}
             <aside className="w-64 bg-secondary/40 backdrop-blur-md border-r border-white/5 text-white hidden md:block shadow-2xl relative z-10">
                 <div className="p-6 border-b border-white/5">
@@ -251,7 +227,7 @@ const AdminDashboard = () => {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 p-8 text-gray-300 relative">
+            <main className="flex-1 min-w-0 p-8 text-gray-300 relative">
                 {/* Background Decorations */}
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[120px] pointer-events-none"></div>
 
@@ -265,7 +241,7 @@ const AdminDashboard = () => {
                         <p className="text-gray-400 mt-2">
                             {activeTab === 'manage-products' && 'View, edit, or delete existing equipment in your catalog.'}
                             {activeTab === 'products' && 'Add new equipment to your catalog.'}
-                            {activeTab === 'blogs' && 'Publish new articles to your blog.'}
+                            {activeTab === 'blogs' && 'Write, edit and publish articles, or keep them as drafts.'}
                         </p>
                     </div>
                     <div className="flex items-center gap-4">
@@ -279,7 +255,7 @@ const AdminDashboard = () => {
                     <h2 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">
                         {activeTab === 'manage-products' && 'Current Product Catalog'}
                         {activeTab === 'products' && 'Add New Product Form'}
-                        {activeTab === 'blogs' && 'Add New Blog Form'}
+                        {activeTab === 'blogs' && (blogEditor ? (blogEditor.blog ? 'Edit Blog Post' : 'New Blog Post') : 'Blog Posts')}
                     </h2>
 
                     {successMessage && (
@@ -495,185 +471,100 @@ const AdminDashboard = () => {
                         </div>
                     )}
 
-                    {activeTab === 'blogs' && (
-                        <div className="space-y-8 animate-fadeIn mb-12">
-                            <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">
-                                Current Blog Posts
-                            </h3>
-                            {blogsData.length === 0 ? (
-                                <p className="text-gray-500 text-sm italic py-4">No blogs found.</p>
-                            ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                                    {blogsData.map((blog) => (
-                                        <div key={blog.slug} className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 p-3 flex flex-col group hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:border-accent/40 transition-all duration-500 relative">
-                                            <button
-                                                onClick={() => handleDeleteBlog(blog.slug)}
-                                                className="absolute top-5 right-5 bg-red-500/90 hover:bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20 shadow-lg backdrop-blur-sm"
-                                                title="Delete Blog"
-                                            >
-                                                <FaTrash className="text-xs" />
-                                            </button>
-                                            <div className="aspect-video bg-secondary/50 relative overflow-hidden rounded-xl border border-white/10">
-                                                <img
-                                                    src={blog.image}
-                                                    alt={blog.title}
-                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                                    onError={(e) => { e.target.src = '/images/ak-sales-logo.png' }}
-                                                />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-xl"></div>
-                                            </div>
-                                            <div className="pt-4 pb-2 px-2 flex-1 flex flex-col">
-                                                <span className="text-[10px] text-accent font-bold uppercase tracking-wider mb-2 block">{blog.category}</span>
-                                                <h4 className="font-bold text-white/90 text-sm md:text-md line-clamp-2 group-hover:text-accent transition-colors duration-300 leading-snug">{blog.title}</h4>
-                                                <div className="mt-auto pt-4 flex items-center justify-between text-xs text-white/50 font-medium">
-                                                    <span>{blog.date}</span>
-                                                    <span>{blog.author}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                    {activeTab === 'blogs' && blogEditor && (
+                        <Suspense fallback={
+                            <div className="py-16 text-center">
+                                <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                                <p className="text-gray-400">Loading the editor…</p>
+                            </div>
+                        }>
+                            <BlogEditor
+                                key={blogEditor.blog?.slug || 'new'}
+                                blog={blogEditor.blog}
+                                categories={blogCategories}
+                                onSaved={handleBlogSaved}
+                                onCancel={() => setBlogEditor(null)}
+                            />
+                        </Suspense>
                     )}
 
-                    {activeTab === 'blogs' && (
-                        <div className="flex flex-col lg:flex-row gap-12 animate-fadeIn border-t border-white/10 pt-8">
-                            <form onSubmit={handleAddBlog} className="space-y-6 lg:w-1/2">
-                                {/* Blog Title */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                                        Blog Title
-                                    </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={blogTitle}
-                                        onChange={(e) => setBlogTitle(e.target.value)}
-                                        className="w-full px-4 py-3 border border-white/10 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent bg-secondary/40 text-white placeholder-gray-500 transition-all font-medium"
-                                        placeholder="e.g. 5 Tips for Choosing Commercial Ovens"
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Blog Category */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                                            Category
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={blogCategory}
-                                            onChange={(e) => setBlogCategory(e.target.value)}
-                                            className="w-full px-4 py-3 border border-white/10 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent bg-secondary/40 text-white placeholder-gray-500 transition-all font-medium"
-                                            placeholder="e.g. Guide, Review, News"
-                                        />
-                                    </div>
-
-                                    {/* Blog Author */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                                            Author
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={blogAuthor}
-                                            onChange={(e) => setBlogAuthor(e.target.value)}
-                                            className="w-full px-4 py-3 border border-white/10 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent bg-secondary/40 text-white placeholder-gray-500 transition-all font-medium"
-                                            placeholder="e.g. Admin, Chef John"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Blog Image Upload */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                                        Featured Image File
-                                    </label>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        required
-                                        onChange={(e) => {
-                                            const file = e.target.files[0];
-                                            setBlogImage(file);
-                                            setBlogImagePreview(file ? URL.createObjectURL(file) : '');
-                                        }}
-                                        className="w-full px-4 py-3 border border-white/10 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent bg-secondary/40 text-white transition-all font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-accent file:text-secondary hover:file:bg-white cursor-pointer"
-                                    />
-                                </div>
-
-                                {/* Blog Content */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                                        Blog Content
-                                    </label>
-                                    <textarea
-                                        required
-                                        value={blogContent}
-                                        onChange={(e) => setBlogContent(e.target.value)}
-                                        rows="6"
-                                        className="w-full px-4 py-3 border border-white/10 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent bg-secondary/40 text-white placeholder-gray-500 transition-all font-medium resize-y"
-                                        placeholder="Write your blog post content here..."
-                                    ></textarea>
-                                </div>
-
-                                {/* Submit Button */}
-                                <div className="pt-6">
-                                    <button
-                                        type="submit"
-                                        className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-secondary bg-accent hover:bg-white transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(212,175,55,0.3)]"
-                                    >
-                                        Publish Blog Post
-                                    </button>
-                                </div>
-                            </form>
-
-                            <div className="lg:w-1/2">
-                                <h3 className="text-lg font-bold text-white mb-6 border-b border-white/10 pb-4">
-                                    Live Preview
-                                </h3>
-                                <div className="max-w-md mx-auto">
-                                    <div className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 shadow-lg group hover:-translate-y-2 transition-all duration-300 hover:shadow-[0_15px_40px_rgba(0,0,0,0.4)] relative">
-                                        <div className="h-48 overflow-hidden relative">
-                                            <div className="absolute inset-0 bg-secondary/20 group-hover:bg-transparent transition-colors z-10 duration-500 pointer-events-none"></div>
-                                            <img
-                                                src={blogImagePreview || "/blog/download.webp"}
-                                                alt={blogTitle || "Blog Subject"}
-                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                                onError={(e) => { e.target.src = '/images/ak-sales-logo.png' }}
-                                            />
-                                            {blogCategory && (
-                                                <div className="absolute top-4 right-4 z-20">
-                                                    <span className="bg-accent text-secondary text-xs font-bold px-3 py-1.5 rounded-full uppercase shadow-lg">
-                                                        {blogCategory}
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="p-6 relative">
-                                            <div className="flex items-center text-sm text-gray-400 mb-3 space-x-4">
-                                                <span className="flex items-center">
-                                                    <span className="w-2 h-2 rounded-full bg-accent mr-2"></span>
-                                                    {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-                                                </span>
-                                                <span className="flex items-center before:content-['•'] before:mr-4 before:text-gray-600">
-                                                    {blogAuthor || 'Author Name'}
-                                                </span>
-                                            </div>
-                                            <h3 className="text-xl font-bold text-white mb-4 line-clamp-2 group-hover:text-accent transition-colors leading-tight">
-                                                {blogTitle || 'Enter Your Blog Title Here'}
-                                            </h3>
-                                            <p className="text-gray-400 mb-6 line-clamp-3 text-sm leading-relaxed">
-                                                {blogContent || 'Your blog abstract or first few lines of content will appear here...'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <p className="text-gray-500 text-xs mt-6 text-center italic">
-                                        This simulates how your blog post will appear as a card on the main Blog Page.
-                                    </p>
-                                </div>
+                    {activeTab === 'blogs' && !blogEditor && (
+                        <div className="space-y-6 animate-fadeIn">
+                            <div className="flex flex-wrap items-center justify-between gap-4">
+                                <p className="text-sm text-gray-400">
+                                    {blogsData.length} {blogsData.length === 1 ? 'post' : 'posts'}, including drafts.
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={() => setBlogEditor({ blog: null })}
+                                    className="inline-flex items-center gap-2 py-3 px-5 rounded-xl shadow-lg text-sm font-bold text-secondary bg-accent hover:bg-white transition-all duration-300"
+                                >
+                                    <FaPlus aria-hidden="true" /> New post
+                                </button>
                             </div>
+
+                            {blogsError && (
+                                <div className="bg-red-500/10 border border-red-400/30 text-red-200 px-4 py-3 rounded-xl flex flex-wrap items-center justify-between gap-3" role="alert">
+                                    <span>{blogsError}</span>
+                                    <button type="button" onClick={loadBlogs} className="text-sm font-bold underline hover:text-white">Try again</button>
+                                </div>
+                            )}
+
+                            {blogsData.length === 0 ? (
+                                !blogsError && <p className="text-gray-500 text-sm italic py-4">No blog posts yet. Start with "New post".</p>
+                            ) : (
+                                <ul className="divide-y divide-white/10 rounded-2xl border border-white/10 bg-secondary/20">
+                                    {blogsData.map((blog) => {
+                                        const isDraft = blog.status === 'draft';
+                                        return (
+                                            <li key={blog.slug} className="flex flex-col sm:flex-row sm:items-center gap-4 p-4">
+                                                <div className="w-full sm:w-32 aspect-video shrink-0 bg-secondary/50 overflow-hidden rounded-xl border border-white/10">
+                                                    {blog.image ? (
+                                                        <img
+                                                            src={blog.image}
+                                                            alt=""
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => { e.target.src = '/images/ak-sales-logo.png' }}
+                                                        />
+                                                    ) : (
+                                                        <span className="w-full h-full flex items-center justify-center text-xs text-gray-500">No image</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                                                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${isDraft ? 'text-amber-200 bg-amber-400/10 border-amber-300/30' : 'text-emerald-300 bg-emerald-400/10 border-emerald-400/30'}`}>
+                                                            {isDraft ? 'Draft' : 'Published'}
+                                                        </span>
+                                                        {blog.category && <span className="text-[10px] text-accent font-bold uppercase tracking-wider">{blog.category}</span>}
+                                                    </div>
+                                                    <h4 className="font-bold text-white/90 leading-snug line-clamp-2">{blog.title || 'Untitled post'}</h4>
+                                                    <p className="text-xs text-white/50 font-medium mt-1">
+                                                        {blogDate(blog)}{blog.author ? ` · ${blog.author}` : ''}
+                                                    </p>
+                                                </div>
+                                                <div className="flex gap-2 shrink-0">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setBlogEditor({ blog })}
+                                                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border border-white/15 text-gray-200 hover:bg-white/10 hover:text-accent transition-colors"
+                                                        aria-label={`Edit "${blog.title}"`}
+                                                    >
+                                                        <FaEdit aria-hidden="true" /> Edit
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleDeleteBlog(blog.slug)}
+                                                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border border-red-400/30 text-red-300 hover:bg-red-500/10 transition-colors"
+                                                        aria-label={`Delete "${blog.title}"`}
+                                                    >
+                                                        <FaTrash className="text-xs" aria-hidden="true" /> Delete
+                                                    </button>
+                                                </div>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            )}
                         </div>
                     )}
                 </div>

@@ -1,3 +1,4 @@
+import Image from './Image';
 import { FaQuoteLeft } from 'react-icons/fa';
 
 const CompanyStory = () => {
@@ -8,7 +9,9 @@ const CompanyStory = () => {
                     {/* Image side */}
                     <div className="relative">
                         <div className="rounded-2xl overflow-hidden shadow-2xl">
-                            <img
+                            <Image
+                                loading="lazy"
+                                decoding="async"
                                 src="https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&q=80"
                                 alt="AK Sales Factory"
                                 className="w-full h-[400px] lg:h-[500px] object-cover"

@@ -1,20 +1,11 @@
-import { useState, useEffect } from 'react';
+import Image from '../components/Image';
 import { useParams, Link } from 'react-router-dom';
 import { FaHome, FaChevronRight, FaPhone, FaArrowLeft, FaArrowRight, FaWhatsapp } from 'react-icons/fa';
-import { fetchProducts } from '../api/products';
-import SEO from '../components/SEO';
+import { useSiteData } from '../lib/site-data';
 
 const CollectionPage = () => {
     const { category } = useParams();
-    const [productsData, setProductsData] = useState(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetchProducts().then(data => {
-            setProductsData(data);
-            setLoading(false);
-        });
-    }, []);
+    const { products: productsData, loading } = useSiteData();
 
     if (loading) {
         return (
@@ -52,7 +43,6 @@ const CollectionPage = () => {
 
     return (
         <div className="min-h-screen bg-secondary">
-            <SEO title={data ? data.title : "Collection"} description={data?.description || "Explore our collection"} />
             {/* Hero Section */}
             <div className="relative overflow-hidden">
                 {/* Background effects */}
@@ -148,7 +138,9 @@ const CollectionPage = () => {
                                 <div className="relative z-10">
                                     {/* Product Image */}
                                     <div className="aspect-[4/3] overflow-hidden bg-white p-6 flex items-center justify-center relative rounded-t-2xl">
-                                        <img
+                                        <Image
+                                            loading="lazy"
+                                            decoding="async"
                                             src={product.image}
                                             alt={product.name}
                                             className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 drop-shadow-2xl"

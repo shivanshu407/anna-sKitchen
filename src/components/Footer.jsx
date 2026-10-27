@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaFacebookF, FaInstagram, FaArrowUp } from 'react-icons/fa';
-import { fetchProducts } from '../api/products';
+import { useSiteData } from '../lib/site-data';
 
 const quickLinks = [
     { name: 'Home', href: '/' },
@@ -23,19 +22,11 @@ const FOOTER_CATEGORY_SLUGS = [
 ];
 
 const Footer = () => {
-    const [productCategories, setProductCategories] = useState([]);
-
-    useEffect(() => {
-        fetchProducts().then(data => {
-            const cats = FOOTER_CATEGORY_SLUGS
-                .filter(slug => data[slug])
-                .map(slug => ({
-                    name: data[slug].title,
-                    href: `/collections/${slug}`,
-                }));
-            setProductCategories(cats);
-        });
-    }, []);
+    const { products } = useSiteData();
+    const productCategories = FOOTER_CATEGORY_SLUGS.filter(slug => products[slug]).map(slug => ({
+        name: products[slug].title,
+        href: `/collections/${slug}`,
+    }));
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -68,7 +59,7 @@ const Footer = () => {
                                 <FaPhone className="text-accent text-xs" />
                                 +91-95107 70343
                             </a>
-                            <a href="tel:+9429768135" className="flex items-center gap-3 text-white/60 text-sm hover:text-accent transition-colors">
+                            <a href="tel:+919429768135" className="flex items-center gap-3 text-white/60 text-sm hover:text-accent transition-colors">
                                 <FaPhone className="text-accent text-xs" />
                                 +91-94297 68135
                             </a>
@@ -130,6 +121,7 @@ const Footer = () => {
                             {[FaFacebookF, FaInstagram].map((Icon, i) => (
                                 <a
                                     key={i}
+                                    aria-label={i === 1 ? 'AK Sales on Instagram' : 'Facebook'}
                                     href={i === 1 ? 'https://www.instagram.com/annas_kitchen_equipments' : '#'}
                                     target={i === 1 ? '_blank' : undefined}
                                     rel={i === 1 ? 'noopener noreferrer' : undefined}

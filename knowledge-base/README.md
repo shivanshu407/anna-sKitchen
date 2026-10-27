@@ -5,14 +5,15 @@
 | Layer        | Technology                                  |
 |--------------|---------------------------------------------|
 | Language     | JavaScript (ESM front-end, CommonJS server) |
-| Framework    | React 19 + Vite 7, React Router 7           |
+| Framework    | React 19 + Vite 7 SSR, React Router 7           |
 | Styling      | Tailwind CSS 4 (via `@tailwindcss/vite`)    |
 | Server       | Express 4                                   |
 | Database     | MongoDB Atlas (Mongoose 8)                  |
 | Media        | Cloudinary (admin uploads only)             |
 | Hosting      | Hostinger — Node.js app (see deployment.md) |
-| SEO          | `react-helmet-async` per-page tags — see seo.md |
+| SEO          | Shared route metadata + React 19 server rendering — see seo.md |
 | Analytics    | Google Analytics 4 (`G-EZE8DTQTEB`)         |
+| Blog editor  | TipTap 3 (admin-only, lazy-loaded) — see blog.md |
 | Auth         | Server-side sessions — see security.md      |
 | Test Runner  | Vitest 5                                    |
 
@@ -24,7 +25,7 @@ vite.config.js         Build config incl. vendor chunk splitting.
 vitest.config.js       Test config.
 src/                   React front-end
   api/                 fetch wrappers (http.js adds read timeouts; auth.js)
-  lib/                 whatsapp.js — builds the enquiry hand-off
+  lib/                 SEO, catalogue context, carousel helper and WhatsApp enquiries
   components/          Shared UI
   pages/               Route-level components
   data/                Bundled fallback catalogue + blogs
@@ -51,7 +52,7 @@ knowledge-base/        This documentation
   does not call `listen()`; only `server.js` does. Adding a second `listen()` will cause
   `EADDRINUSE` on Hostinger.
 - **Never bind a hardcoded port.** Hostinger injects `PORT`.
-- **Build before serving.** `server/index.js` only mounts the SPA if `dist/` exists.
+- **Build before serving.** Both `dist/` and `dist-server/entry-server.js` are required. Serve through Node; static-only hosting loses the SEO rendering contract.
 - **Do not hand-edit files in `public/`.** They are generated. Edit the source in
   `public-original/` and re-run the pipeline — see assets.md.
 - **Asset filenames must stay lowercase and hyphenated.** Hostinger serves from Linux
@@ -67,15 +68,15 @@ knowledge-base/        This documentation
 ## Quick Facts
 | Key          | Value                                            |
 |--------------|--------------------------------------------------|
-| Repo         | github.com/MBKANERIYA/anna-sKitchen (default `main`) |
-| Prod URL     | https://annakitchenequipment.com (until the move) |
-| New domain   | https://aksales.in — Hostinger parking page as of 2026-10-01 |
-| Deployed     | `6ade621` as of 2026-10-01 — AK logo + Analytics live, rebrand (`a55833b`) not yet |
+| Repo         | github.com/shivanshu407/anna-sKitchen (requested target; local origin remains MBKANERIYA) |
+| Prod URL     | https://aksales.in — verified live 2026-10-02 |
+| Old domain   | annakitchenequipment.com — redirect-only PHP/HTML entry, HTTPS active; one-hop 301s to matching new URLs |
+| Deployed     | aksales-hostinger-2026-10-02-final.zip, hPanel Completed/Current; live SSR/crawler endpoints verified |
 | Deploy       | Hostinger -> Deploy Web App -> import Git repo    |
 | Previous     | Vercel (dev staging)                             |
 | DB           | MongoDB Atlas                                    |
 | Test Command | `npm test` (builds first, then runs Vitest)      |
-| Build        | `npm run build` -> `dist/`                       |
+| Build        | `npm run build` -> `dist/` + `dist-server/`                       |
 | Start        | `npm start` -> `node server.js`                  |
 
 ## Reading Order
@@ -84,7 +85,9 @@ knowledge-base/        This documentation
 | README.md          | Always first                                  |
 | deployment.md      | Before deploying or changing hosting          |
 | security.md        | Before touching the admin area or API auth    |
-| seo.md             | Before changing titles, meta tags or Analytics |
+| seo.md             | Before changing titles, canonical URLs, crawler endpoints or schema |
+| rendering.md       | Before changing SSR, hydration or catalogue snapshots |
+| blog.md            | Before changing the blog editor, blog API, storage or blog pages |
 | forms.md           | Before changing any public form or enquiry flow |
 | architecture.md    | Before touching how the app is wired          |
 | decisions.md       | Before undoing something that looks odd       |

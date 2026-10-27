@@ -1,26 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import Image from './Image';
 import { Link } from 'react-router-dom';
 import { FaArrowRight, FaCalendar } from 'react-icons/fa';
-import { fetchBlogs } from '../api/blogs';
+import { useSiteData } from '../lib/site-data';
 
 const BlogSection = () => {
-    const [blogs, setBlogs] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const loadBlogs = async () => {
-            try {
-                const data = await fetchBlogs();
-                // Show only up to 4 latest blogs on the homepage section
-                setBlogs(data.slice(0, 4));
-            } catch (error) {
-                console.error("Failed to fetch blogs:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadBlogs();
-    }, []);
+    const { blogs: allBlogs, loading } = useSiteData();
+    const blogs = allBlogs.slice(0, 4);
 
     return (
         <section id="blog" className="section-padding bg-gold-light">
@@ -47,9 +32,11 @@ const BlogSection = () => {
                                 style={{ textDecoration: 'none' }}
                             >
                                 <div className="relative aspect-[16/10] overflow-hidden">
-                                    <img
+                                    <Image
+                                        loading="lazy"
+                                        decoding="async"
                                         src={blog.image}
-                                        alt={blog.title}
+                                        alt={blog.imageAlt || blog.title}
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                     />
                                     <span className="absolute top-4 left-4 bg-accent text-secondary text-xs font-bold px-3 py-1 rounded-full">

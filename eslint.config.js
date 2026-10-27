@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', 'public-original', 'public-optimized']),
+  globalIgnores(['dist', 'dist-server', 'public-original', 'public-optimized']),
 
   // Browser / React source
   {

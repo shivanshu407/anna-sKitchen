@@ -35,6 +35,8 @@ const MUTATIONS = [
     ['POST', '/api/products'],
     ['DELETE', '/api/products/heating-range/0'],
     ['POST', '/api/blogs'],
+    ['PUT', '/api/blogs/some-slug'],
+    ['POST', '/api/blogs/images'],
     ['DELETE', '/api/blogs/some-slug'],
 ];
 
@@ -77,6 +79,11 @@ describe('read routes stay public', () => {
         const res = await fetch(`${base}/api/blogs`);
         expect(res.status).not.toBe(401);
     }, DB_WAIT);
+
+    it('GET /api/blogs?drafts=1 requires a session, since it lists drafts', async () => {
+        const res = await fetch(`${base}/api/blogs?drafts=1`);
+        expect(res.status).toBe(401);
+    });
 });
 
 describe('login', () => {

@@ -1,3 +1,4 @@
+import Image from '../components/Image';
 import { Link } from 'react-router-dom';
 import { FaHome, FaChevronRight, FaTools, FaCogs, FaTruckMoving, FaClipboardCheck, FaHandshake, FaWrench } from 'react-icons/fa';
 import CTA from '../components/CTA';
@@ -144,7 +145,9 @@ const ServicesPage = () => {
                             key={index}
                             className={`relative group overflow-hidden rounded-xl ${img.span} cursor-pointer`}
                         >
-                            <img
+                            <Image
+                                loading="lazy"
+                                decoding="async"
                                 src={img.src}
                                 alt={img.alt}
                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"

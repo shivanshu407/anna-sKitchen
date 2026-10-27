@@ -99,3 +99,26 @@ and the byte-size numbers above.
 ## Related
 - [deployment.md](deployment.md) — cache headers applied to these files
 - [changelog.md](changelog.md) — the migration entry
+
+## Responsive images and local fonts (2026-10-02)
+scripts/build-seo-assets.mjs is an additive pipeline for public/responsive and
+src/data/image-manifest.json. It reads original images when a mapped source exists,
+otherwise the existing optimized file, and never deletes originals or existing assets.
+Run `node scripts/build-seo-assets.mjs` when source assets change. Current output: 98
+manifest images and 331 WebP variants at widths 160/480/960/1440, capped to source size.
+SVG intrinsic dimensions are recorded without rasterization. Original 201 files across
+public/public-original retained their hashes during this release.
+
+src/components/Image.jsx supplies manifest width/height/srcSet with explicit prop overrides.
+Use sizes for the actual layout: 80px header logo, 150px slider logos, 100vw heroes,
+responsive grid defaults elsewhere. Preserve existing source URLs; Cloudinary uploads
+without a manifest continue to work. Lazy-load below-fold imagery, never the first hero.
+
+Inter and Outfit Latin variable WOFF2 files are self-hosted in public/fonts, with OFL
+licenses and source copies in brand/fonts. index.css defines font-display:swap; index.html
+preloads the two local fonts. No external Google Fonts stylesheet is required. Retain
+licenses and regenerate deliberately if non-Latin coverage becomes necessary.
+
+Tests: Image.test.jsx and build-seo-assets.test.mjs cover dimensions, variants, overrides
+and preservation. Playwright verified loaded fonts and no mobile horizontal overflow.
+See [rendering.md](rendering.md) and [seo.md](seo.md).

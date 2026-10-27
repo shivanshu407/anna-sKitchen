@@ -19,16 +19,19 @@ when unconfigured. See [security.md](security.md).
 including forged-cookie and unconfigured-server cases.
 
 ## ISSUE-002: Collection pages fetch `/api/products` three times per render
-**Status**: Open
+**Status**: Resolved — final release deployed by owner on 2026-10-02
 **Severity**: Low
 **Discovered**: 2026-09-07
+**Resolved**: 2026-10-02 (source)
 **Symptom**: Network panel shows three concurrent `GET /api/products` on
 `/collections/:category`, and a fourth on pages that also list blogs.
 **Root Cause**: Several components call `fetchProducts()` independently with no shared
 cache or context.
 **Workaround**: None needed. Responses are small and the browser coalesces some of it.
-**Fix**: Not done. A single provider or a small cache in `src/api/` would remove it.
-**Regression Test**: None.
+**Fix**: Shared SiteDataProvider supplies one initial SSR snapshot to public pages, menus
+and homepage sections. Development fetches once through the provider.
+**Regression Test**: server/seo.test.js validates the shared rendered/bootstrap content;
+browser hydration checked without initial duplicate public catalogue requests.
 
 ## ISSUE-003: Brochure PDF is 16.7 MB
 **Status**: Accepted Risk
@@ -45,15 +48,13 @@ cache or context.
 **Status**: Open
 **Severity**: Low
 **Discovered**: 2026-09-07
-**Symptom**: `npm run lint` reports 2 errors and 2 warnings (it was 4 + 2 until the owner's
-2026-09-08 commit removed two unused `index` parameters).
-**Root Cause** (as of 2026-10-01): an unused `e` in `server/routes/blogs.js:58`; a
-`set-state-in-effect` error in `src/components/Header.jsx:64`; `exhaustive-deps` warnings
-in `src/components/Header.jsx:34` and `src/pages/AdminDashboard.jsx:50`.
+**Symptom**: Final 2026-10-02 lint reports 1 error and 1 warning.
+**Root Cause**: an unused `e` in `server/routes/blogs.js:58` and an exhaustive-deps warning
+in `src/pages/AdminDashboard.jsx:49`. These precede the SEO work.
 **Workaround**: None needed; none block the build.
-**Fix**: Not done — untouched by the hosting work and left alone deliberately. Note the
-count was 66 before 2026-09-07 because ESLint applied browser globals to server code; the
-config now lints Node files correctly, so these 6 are genuine.
+**Fix**: Header findings resolved while adopting shared catalogue data and resetting menu
+lifecycle on navigation. The blogs.js error was removed by the 2026-10-27 blog route
+rewrite; only the AdminDashboard exhaustive-deps warning remains (lint: 0 errors, 1 warning).
 **Regression Test**: `npm run lint`.
 
 ## ISSUE-005: Hosting plan may not support Node.js apps
@@ -169,7 +170,8 @@ white has very little contrast.
 "Anna Kitchen Equipments".
 **Root Cause**: The file was renamed during the rebrand; its contents are a designed PDF that
 cannot be edited here.
-**Workaround**: None.
+**Workaround**: This release sends X-Robots-Tag:noindex for PDFs and redirects legacy PDF
+URLs to the existing download. This does not change the brochure's content.
 **Fix**: Get a rebranded brochure from whoever designed it. **Publish it under a new filename**
 (e.g. `ak-sales-brochure-2026.pdf`) and update the six links — overwriting in place would
 serve the old PDF to returning visitors for up to 30 days (`public/` cache TTL).
@@ -221,20 +223,26 @@ takes ~0.7 s, so that needs a ~13x slowdown and is unproven.
 the full output; the hook's error text is what has been missing.
 **Regression Test**: N/A.
 
+**2026-10-02 evidence**: Captured `Hook timed out in 10000ms` during setup. Baseline
+58 passed/30 skipped; the immediate verbose server rerun passed 49/49. A later full run
+also hit setup timeouts; the final full run passed 160/160. No timeout was increased and
+no assertion was weakened. The underlying intermittent slowdown remains unconfirmed.
+
 ## ISSUE-014: Pages with `<SEO>` carry two description meta tags
-**Status**: Open
+**Status**: Resolved — final release deployed by owner on 2026-10-02
 **Severity**: Low
 **Discovered**: 2026-10-01
+**Resolved**: 2026-10-02 (source)
 **Symptom**: On Home, Collections, a collection, Blogs, a blog post and the admin dashboard,
 the rendered `<head>` has two `<meta name="description">` tags — the site-wide one from
 `index.html` and the page's own. Verified in a browser on `/collections`.
 **Root Cause**: `react-helmet-async` only replaces tags it created; the static tag in
 `index.html` is not one of them, so Helmet adds a second rather than replacing it.
 **Workaround**: None needed for visitors. Google may choose either text for the snippet.
-**Fix**: Not done. Typically: mark the `index.html` tag `data-rh="true"` so Helmet owns it, or
-give every page an `<SEO>` and drop the static tag. Check the non-JavaScript fallback
-before choosing.
-**Regression Test**: None yet.
+**Fix**: One shared SEO component covers every route. Development fallback metadata has
+Helmet ownership; production replaces it with the React 19 rendered head.
+**Regression Test**: server/seo.test.js; browser checked one title, description and canonical
+before and after navigation.
 
 ## ISSUE-015: Unused `helmet` dependency
 **Status**: Open
@@ -249,3 +257,48 @@ unrelated. ⚠️ Needs confirmation from the owner.
 changes response headers (CSP in particular can break the Google Analytics script and Google
 Fonts) and needs testing.
 **Regression Test**: N/A.
+
+## ISSUE-016: Live crawler endpoints and page rendering require the SEO deployment
+**Status**: Resolved
+**Severity**: High
+**Discovered**: 2026-10-02
+**Resolved**: 2026-10-02
+**Symptom**: The old live domain returns HTML with HTTP 200 for robots.txt and sitemap.xml;
+unknown routes use the SPA shell, and initial HTML carries the old brand/city. aksales.in
+is still parked.
+**Root Cause**: Old deployment uses the universal SPA fallback and has not received the
+AK Sales rebrand or this SEO release.
+**Workaround**: None on the live deployment.
+**Fix**: Owner deployed the verified Node/SSR package on aksales.in; old-domain path/query
+redirects were then configured in Hostinger and verified live.
+**Regression Test**: server/seo.test.js and output/seo/old-domain-redirect-verification.json.
+
+**Live resolution**: Owner deployed the final ZIP, confirmed Completed/Current in hPanel.
+aksales.in now serves AK Sales SSR HTML, XML sitemap, text robots and real missing-page
+404s; health reports database connected. Old apex/www HTTP/HTTPS redirect to matching
+new URLs with 20/20 live checks. Search Console account work remains a separate step.
+
+## ISSUE-017: Mobile lab LCP and theme contrast remain below target
+**Status**: Open
+**Severity**: Medium
+**Discovered**: 2026-10-02
+**Symptom**: Final local mobile Lighthouse: performance 77, accessibility 93, LCP 5.1s;
+SEO and best practices 100, CLS 0. Prior optimized run scored performance 79.
+**Root Cause**: Lab image discovery checks pass; remaining LCP time is largely rendering
+delay. Existing theme combinations still trigger the contrast audit. Field causes require
+measurement on the actual deployment; do not infer them from local lab scores alone.
+**Workaround**: Responsive images, local fonts, stable first hero and visible-only logo
+animation reduce load/work; no field Core Web Vitals claim is made.
+**Fix**: Pending deployment measurements and, if requested, theme contrast refinement.
+**Regression Test**: output/seo/lighthouse-mobile-release.report.json; source behavior is
+covered by Image, auto-scroll and main tests. Lighthouse is a lab check, not deterministic CI.
+
+## ISSUE-018: Blog editor has no unsaved-changes prompt
+**Status**: Open
+**Severity**: Low
+**Discovered**: 2026-10-27
+**Symptom**: Switching admin tabs or pressing Cancel in the blog editor discards unsaved work without asking.
+**Root Cause**: The editor keeps its state in memory only; no navigation guard or local draft autosave exists.
+**Workaround**: Use "Save draft" often; drafts are hidden from the public site.
+**Fix**:
+**Regression Test**: None yet.

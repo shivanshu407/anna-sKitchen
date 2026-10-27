@@ -19,10 +19,10 @@ const TopBar = () => {
                     </span>
                 </div>
                 <div className="flex items-center gap-3">
-                    <a href="#" className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-accent hover:text-secondary transition-all duration-300">
+                    <a href="#" aria-label="Facebook" className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-accent hover:text-secondary transition-all duration-300">
                         <FaFacebookF className="text-xs" />
                     </a>
-                    <a href="https://www.instagram.com/annas_kitchen_equipments" target="_blank" rel="noopener noreferrer" className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-accent hover:text-secondary transition-all duration-300">
+                    <a href="https://www.instagram.com/annas_kitchen_equipments" aria-label="AK Sales on Instagram" target="_blank" rel="noopener noreferrer" className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-accent hover:text-secondary transition-all duration-300">
                         <FaInstagram className="text-xs" />
                     </a>
 

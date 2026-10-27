@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import Image from '../components/Image';
 import { Link } from 'react-router-dom';
 import { FaHome, FaChevronRight, FaArrowRight } from 'react-icons/fa';
-import { fetchProducts } from '../api/products';
-import SEO from '../components/SEO';
+import { useSiteData } from '../lib/site-data';
 
 
 const ALLOWED_SLUGS = [
@@ -16,18 +15,8 @@ const ALLOWED_SLUGS = [
 ];
 
 const Collections = () => {
-    const [categories, setCategories] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetchProducts().then(data => {
-            const filtered = ALLOWED_SLUGS
-                .filter(slug => data[slug])
-                .map(slug => data[slug]);
-            setCategories(filtered);
-            setLoading(false);
-        });
-    }, []);
+    const { products, loading } = useSiteData();
+    const categories = ALLOWED_SLUGS.filter(slug => products[slug]).map(slug => products[slug]);
 
     if (loading) {
         return (
@@ -42,7 +31,6 @@ const Collections = () => {
 
     return (
         <div className="min-h-screen bg-secondary">
-            <SEO title="Collections" description="Browse our premium commercial kitchen equipment collections." />
             {/* Hero Banner */}
             <div className="relative py-24 md:py-32 overflow-hidden">
                 {/* Animated gradient background */}
@@ -115,7 +103,9 @@ const Collections = () => {
                                 <div className="relative">
                                     {/* Image container */}
                                     <div className="relative overflow-hidden aspect-[4/3] bg-white rounded-t-2xl">
-                                        <img
+                                        <Image
+                                            loading="lazy"
+                                            decoding="async"
                                             src={cat.products[0]?.image || '/images/ak-sales-logo.png'}
                                             alt={cat.title}
                                             className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-1000 ease-out"

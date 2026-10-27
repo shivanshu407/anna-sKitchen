@@ -159,3 +159,112 @@ declined by the owner.
 **Consequences**: A new guard test (`src/branding.test.js`) fails the build if the old name or
 Lucknow reappears. One database field and the brochure contents remain on the old brand until
 handled outside the codebase.
+
+## Decision: Shared route metadata and native React server rendering
+**Date**: 2026-10-02
+**Status**: Accepted
+**Context**: The domain migration needs real crawler files, route-specific initial HTML,
+correct 404s, stable canonical URLs and consistent live catalogue content. The old SPA
+returned its shell for crawler endpoints and depended on client-side fetching.
+**Decision**: Keep Express, React Router and all existing public URL contracts. Build a
+Vite SSR entry alongside the client bundle, use one metadata resolver fixed to aksales.in,
+and render from a shared cached catalogue snapshot. React 19 document rendering collects
+native hoisted metadata. Successful admin writes invalidate the 60-second snapshot.
+**Alternatives Considered**: Metadata-only changes would leave empty initial content and
+false 200s. Static prerendering would stale after admin updates. A framework migration
+would unnecessarily change the deployment and URL contracts.
+**Consequences**: Both dist and dist-server must exist on Hostinger. Public content no
+longer needs duplicate initial fetches. Failed configured DB reads preserve known content;
+unknown dynamic routes and the sitemap use retryable 503s rather than false deletion data.
+Tests use the existing Vitest runner and real built HTTP responses with isolated services.
+
+## Decision: Preserve factual schema and existing migration URLs
+**Date**: 2026-10-02
+**Status**: Accepted
+**Context**: Product pricing/reviews are unavailable and old links must survive the move.
+**Decision**: Emit factual LocalBusiness, WebSite, breadcrumbs, Product and BlogPosting
+markup without invented offers/ratings/dates. Keep category, product and legacy blog
+paths. Canonicalize HTTPS apex, trailing slashes and product-name casing. Exclude admin,
+API, PDFs and empty categories from indexing; generate a current sitemap from the snapshot.
+**Alternatives Considered**: Renaming legacy slugs during the domain move adds migration
+risk. Placeholder prices/reviews create misleading markup. Static sitemap dates would be
+fabricated. Old-domain redirects in-app conflict with the owner's settled hPanel choice.
+**Consequences**: Rich-result eligibility is not promised. Search Console ownership and
+path/query-preserving old-domain redirects remain deployment requirements.
+
+## Decision: Additive responsive assets, local fonts and bounded animation
+**Date**: 2026-10-02
+**Status**: Accepted
+**Context**: Mobile lab loading was slow; the hero rotated during load, fonts were external,
+large images served every viewport and logo tracks ran animation frames offscreen.
+**Decision**: Generate additional WebP variants and an intrinsic-dimension manifest while
+preserving all originals and stable URLs. Self-host licensed Inter/Outfit Latin WOFF2 fonts.
+Use explicit image sizes, lazy below-fold images, manual hero controls, and one tested
+visible-only carousel helper honoring reduced motion. Let SSR paint before hydration.
+**Alternatives Considered**: Re-encoding existing originals in place violates preservation;
+blind image preloads duplicate responsive transfers. Removing the hero/brand design would
+be a redesign. Leaving perpetual offscreen loops wastes main-thread work.
+**Consequences**: The release contains more assets; browsers choose smaller variants.
+Future images need manifest regeneration. Local lab scores improve but do not establish
+field Core Web Vitals; LCP and existing theme contrast still need deployed measurement.
+
+## Decision: Redirect-only old-domain entry with raw-path LiteSpeed rewrite
+**Date**: 2026-10-02
+**Status**: Accepted
+**Context**: Owner deployed the new site by changing the Node app's domain. The old domain
+became parked. hPanel's basic redirect discarded HTTP deep paths, and using REQUEST_URI
+with NE produced unescaped product-name spaces on this host.
+**Decision**: Use an empty PHP/HTML entry on the existing plan, keep old SSL active, and
+install a host-limited .htaccess 301 rule capturing the raw path from THE_REQUEST. Remove
+the conflicting basic rule and redundant old-domain HTTPS hop; redirect both protocols
+straight to the new HTTPS apex with query strings intact.
+**Alternatives Considered**: DNS aliases alone cannot issue HTTP redirects; duplicating
+the Node app is unnecessary; basic forwarding lost deep links; client-side redirects do
+not establish a permanent HTTP migration signal. The in-app alternative remains declined.
+**Consequences**: Maintain old domain/TLS/redirect entry. The rule is managed through the
+old site's File Manager, so the hPanel Redirects list is empty. Live 20-case verification
+covers protocols, hosts, encoded paths and queries; new app code is unaffected.
+
+## Decision: Blog bodies are TipTap JSON rendered by our own React code
+**Date**: 2026-10-27
+**Status**: Accepted
+**Context**: The admin blog form was one textarea saved as a single heading/text section, so
+posts had no subheadings, lists, links, tables, inline images, alt text or SEO fields. The
+owner is non-technical and needs Word-like formatting; pages must stay server-rendered and
+safe from stored XSS.
+**Decision**: A TipTap 3 visual editor (admin-only, lazy-loaded) produces ProseMirror JSON.
+`server/blog-input.js` sanitizes it against an allowlist of nodes, marks, link protocols and
+image hosts; `src/components/BlogContent.jsx` maps the JSON to React elements. No HTML
+strings are stored or injected. Legacy `[{heading,text}]` posts are converted on read by
+`legacyToBody` and retired when edited.
+**Alternatives Considered**: Markdown with a toolbar (writer sees syntax, easy to break
+heading order); stored HTML (needs an HTML sanitizer on every render path and invites
+`dangerouslySetInnerHTML`); a home-made block editor (no new dependencies but poor writing
+experience and no inline links/bold without reinventing an editor).
+**Consequences**: Five exact-pinned `@tiptap/*` packages. The editor's extensions and the
+server allowlist must change together. Rendering is fully under our control (heading ids,
+link rel, figures, table headers). Content cannot be edited as raw HTML.
+
+## Decision: Drafts via a `status` field; published URLs are immutable
+**Date**: 2026-10-27
+**Status**: Accepted
+**Context**: Editing and drafts were requested. Existing documents have no status, and
+there is no redirect table for blog slugs.
+**Decision**: `status` is `draft` or `published`; documents without it count as published.
+Every public read (API, SSR snapshot, metadata, sitemap) excludes drafts. A post's slug is
+editable only while it is a draft; once published, PUT refuses a slug change.
+**Alternatives Considered**: A separate drafts collection (duplicated schema); allowing
+slug changes with stored redirects (more surface than the owner needs now).
+**Consequences**: Unpublishing a post returns it to draft and its URL 404s until
+republished. Renaming a published URL needs a code-level redirect.
+
+## Decision: Keep FAQPage markup despite Google's FAQ rich-result removal
+**Date**: 2026-10-27
+**Status**: Accepted
+**Context**: Google stopped showing FAQ rich results in May 2026. Answer engines (AI
+Overviews, ChatGPT, Perplexity, Bing) still favour clearly marked question/answer pairs.
+**Decision**: Posts may carry FAQs, rendered visibly (H2 + H3 questions) and as FAQPage
+JSON-LD whose text matches the page.
+**Alternatives Considered**: Dropping FAQ schema (loses a harmless machine-readable signal);
+FAQ schema without visible content (violates structured-data guidelines).
+**Consequences**: No Google stars should be expected; the value is extractable answers.

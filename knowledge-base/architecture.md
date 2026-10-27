@@ -1,7 +1,7 @@
 # Architecture
 
 ## System Overview
-A React single-page application backed by a small Express API, both served by one Node
+A React application rendered on the server and hydrated in the browser, backed by a small Express API, both served by one Node
 process. The catalogue and blog content live in MongoDB Atlas, with an identical-shaped
 copy bundled into the front-end as a fallback, so the site renders fully even when the
 database is unreachable. Admin image uploads go to Cloudinary rather than local disk. Writes
@@ -30,7 +30,7 @@ stored. The business trades as **AK Sales** (Surat).
            |                    +--> Cloudinary --+---> Cloudinary CDN
            |                          (uploads)   |
            |  express.static('dist')              |
-           |  GET *  -> dist/index.html           |
+           |  GET *  -> route-aware SSR HTML or 404           |
            +--------------------------------------+
 
    Fallback path: if /api/products fails or exceeds 5 s, the SPA renders
@@ -52,7 +52,7 @@ stored. The business trades as **AK Sales** (Surat).
 | Media       | Cloudinary + Multer     | Admin image uploads (memory storage, no disk)   |
 | Auth        | HMAC-signed httpOnly cookie, scrypt | Admin sessions; `requireAuth` on writes (security.md) |
 | Enquiries   | `src/lib/whatsapp.js`   | Hands forms to WhatsApp; nothing stored (forms.md) |
-| SEO         | `react-helmet-async` + `index.html` | Titles, descriptions, Analytics (seo.md) |
+| SEO         | Shared resolver + React 19 SSR | Canonicals, metadata, schema and crawler routes (seo.md) |
 | Hosting     | Hostinger Node.js app   | Process supervision, TLS, restarts              |
 | Testing     | Vitest 5                | Hosting contract, auth, forms, assets, branding |
 
@@ -64,8 +64,7 @@ fallback a drop-in. If the request fails or exceeds 5 s, `fetchProducts()` catch
 and returns the bundled data. The page cannot tell the difference.
 
 **Deep link / hard refresh.** `GET /collections/heating-range` reaches Express, matches no
-API route and no file in `dist/`, and falls through to `GET *`, which returns
-`dist/index.html`. React Router then resolves the route in the browser.
+API route and no file in `dist/`, and falls through to `server/web.js`, which resolves metadata/status, renders the public React route with catalogue data, and returns its HTML. The browser hydrates with the same safely serialized data; see [rendering.md](rendering.md).
 
 **Admin upload.** The dashboard posts `multipart/form-data`. Multer buffers the file in
 memory, the route base64-encodes it and uploads to Cloudinary, and only the returned
@@ -90,7 +89,7 @@ what keeps the app stateless enough for a restart to be free.
 |----------------|-----------------------|--------------------------------------------------|
 | MongoDB Atlas  | Content storage       | Site serves bundled catalogue; admin cannot save |
 | Cloudinary     | Image hosting for uploads | New uploads fail; existing images keep serving |
-| Google Fonts   | Inter + Outfit        | Falls back to system fonts                       |
+| Local WOFF2 fonts | Inter + Outfit from `public/fonts/` | Falls back to system fonts if missing |
 | Unsplash       | Some hero/services imagery | Those images break — hotlinked, not local   |
 | WhatsApp       | Receives every enquiry | Forms open WhatsApp but nothing arrives; no record kept |
 | Google Analytics | Traffic reporting   | Nothing visible to visitors; reports have a gap  |

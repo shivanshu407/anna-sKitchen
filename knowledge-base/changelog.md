@@ -1,5 +1,47 @@
 # Changelog
 
+## 2026-10-27 — SEO/AEO-ready blog editor, drafts and editing
+**What**: Replaced the single-textarea blog form with a TipTap visual editor, SEO fields, a live SEO checklist, drafts, full preview and editing of published posts; public blog pages and metadata now render structured content.
+**Why**: Posts could not have subheadings, lists, links, tables, inline images, alt text, meta title/description, summaries, FAQs or update dates, so they were weak for search engines and AI answer engines.
+**Impact**: New blog fields in MongoDB (additive; documents without `status` stay published). New routes PUT /api/blogs/:slug, POST /api/blogs/images, GET /api/blogs?drafts=1 (admin). Drafts are hidden from the API, SSR, metadata and sitemap. Published slugs are immutable. Editing a legacy post converts its sections to the new body. Five exact-pinned @tiptap packages (3.32.0) load only in the admin chunk.
+**Files Changed**: server/models/Blog.js, server/blog-input.js (new), server/routes/blogs.js, server/web.js; src/lib/blog-content.js, blog-seo-check.js (new), seo.js; src/components/BlogContent.jsx, BlogArticle.jsx (new), SEO.jsx, BlogSection.jsx; src/components/admin/BlogEditor.jsx, RichTextEditor.jsx, SeoPanel.jsx (new); src/pages/BlogPage.jsx, BlogsListPage.jsx, AdminDashboard.jsx; src/api/blogs.js; package.json/package-lock.json; tests listed below; knowledge-base blog.md (new), README, decisions, seo, security, testing, known-issues, active-context.
+**Tests**: New server/blog-input.test.js, server/blogs-routes.test.js, src/lib/blog-content.test.js, src/lib/blog-seo-check.test.js, src/components/BlogContent.test.jsx, src/components/BlogArticle.test.jsx, src/api/blogs.test.js; extended src/lib/seo.test.js and server/auth-routes.test.js. Final `npm test`: both builds pass, 341/341 tests across 22 files (one run hit the ISSUE-013 setup flake; immediate re-run green). Lint: 0 errors, 1 pre-existing warning. Browser check on a local no-database server: editor toolbar (H2, link dialog, table), live checklist, publish blocking, preview, inline save error, legacy post SSR (one H1, heading ids, TOC, schema) and 375px layout with no overflow. Not verified: Cloudinary uploads and real Atlas saves.
+**Commit**: On branch `blog-seo-editor` (together with the previously uncommitted 2026-10-02 SEO release work); not merged to main or pushed.
+
+- Research basis: Google Article structured data (recommended author.url, dateModified, ISO dates), Google image SEO (alt, captions, filenames, srcset), Google's May 2026 FAQ rich-result removal, and AEO practice (answer-first summary, self-contained sections, question headings, tables/lists).
+- Built in parallel by three agents with disjoint file ownership, then integrated. Browser verification found the editor stuck on "Loading editor" (TipTap useEditorState snapshot taken before the editor exists); fixed by reading editor state directly until the first transaction. No automated regression test: the project has no DOM test library.
+- npm audit reports 26 vulnerabilities, all in pre-existing packages; none in @tiptap/* or prosemirror.
+
+## 2026-10-02 — Activate old-domain redirects after owner deployment
+**What**: Connected a redirect-only Hostinger website for annakitchenequipment.com and installed path/query-preserving permanent redirects to https://aksales.in.
+**Why**: Owner deployed the new site; changing the old app's domain left the old domain parked and unable to redirect existing links.
+**Impact**: Old apex/www HTTP/HTTPS URLs now return one-hop 301s to the same path/query on the new HTTPS apex. Old TLS remains active. The new app is unchanged; the old empty site exists solely for redirects on the existing plan.
+**Files Changed**: Remote old-domain public_html/.htaccess; local deploy/htaccess-old-domain-redirect; knowledge-base/README.md, deployment.md, active-context.md, known-issues.md, decisions.md and changelog.md. Live evidence saved under output/seo (gitignored).
+**Tests**: Live 20/20 exact 301/Location checks pass, including encoded products and edge characters; four destination pages return 200. New site health connected, XML sitemap, text robots, missing-page 404 and www normalization verified. No automated unit test added because only remote hosting configuration changed; real HTTP checks verify the actual LiteSpeed behavior. Full app suite not rerun because no application logic changed; previous 160/160 result remains the last app suite result.
+**Commit**: Not committed or pushed.
+
+- New deployment confirmed in hPanel as aksales-hostinger-2026-10-02-final.zip Completed/Current; owner performed that deployment.
+- Hostinger connected the old domain using its existing nameservers. The old SSL certificate remains active; its redundant Force HTTPS hop was removed so the redirect goes directly to the new HTTPS site.
+- Replaced the conflicting hPanel basic redirect with .htaccess; the basic rule discarded HTTP page paths. Raw THE_REQUEST capture preserves encoded paths where REQUEST_URI/NE produced spaces on this host.
+- Configuration persistence verified by reloading the file editor. Screenshot and full live response matrix saved; no credentials recorded.
+
+## 2026-10-02 — AK Sales domain migration technical SEO release
+**What**: Implemented server-rendered public pages, shared metadata/crawler endpoints and responsive assets for https://aksales.in; prepared the Hostinger upload package.
+**Why**: The new domain was parked, live metadata named the old brand/city, crawler endpoints returned SPA HTML, and client-only pages had incomplete initial crawl content.
+**Impact**: Hosting must run Node with both dist and dist-server. Missing routes return 404; admin/empty collections are noindex; URL normalization uses 301. Public content shares a cached database snapshot. Old-domain redirects remain in hPanel and are not yet active.
+**Files Changed**: src/lib/seo.js and tests; SEO, SiteDataProvider, Image, Header, Hero, public data pages and image consumers; src/entry-server.jsx, main.jsx and tests, App.jsx, blogsData.js, index.css, branding.test.js; server/content.js, web.js, index.js, routes/products.js and tests; scripts/build-seo-assets.mjs and tests; image manifest, responsive assets and licensed fonts; index.html, package.json, vite.config.js, eslint.config.js, .gitignore; task-relevant knowledge-base files including rendering.md.
+**Tests**: Final npm test 160/160 pass (15 files), both Vite builds pass. New focused hydration/carousel tests 7/7 pass. Fresh upload extraction npm ci/build pass. Full lint: 1 pre-existing error and 1 warning (ISSUE-004). Browser hydration/navigation, loaded fonts and 390px overflow checks pass. Final local mobile Lighthouse: SEO 100, best practices 100, accessibility 93, performance 77, FCP 2.0s, LCP 5.1s, TBT 200ms, CLS 0; prior optimized run performance 79. Full suite was required because rendering and catalogue sharing affect all public routes. No live deployment/Atlas writes or field Core Web Vitals verified.
+**Commit**: Not committed or pushed.
+
+- Canonicals, social metadata, factual business/product/article/breadcrumb schema and dynamic sitemap use the new HTTPS apex. Legacy URL paths are retained; prices/reviews/dates are not invented.
+- Source fixes address duplicate descriptions, repeated initial catalogue fetching, false route 200s, crawler HTML responses and encoded product-name decoding. Database outage semantics preserve known content and use retryable 503s where appropriate.
+- Additive responsive pipeline generated 331 variants for 98 manifest images; all 201 original files retained hashes. Fonts are self-hosted with licenses; below-fold images lazy-load and logo animation pauses offscreen/for reduced motion. Hero controls remain manual to avoid replacing LCP during loading.
+- Intermittent setup failures captured as 10-second hook timeouts (ISSUE-013); final full run green without weakened assertions/timeouts.
+- Release package: output/aksales-hostinger-2026-10-02-final.zip. hPanel access and app-specific DNS target remain the deployment blocker. Source fixes are not claims that the live site has changed.
+- Fresh package runtime smoke passed: homepage/product/robots 200, real missing page 404,
+  valid XML sitemap with 79 fallback routes and single title per tested page. ZIP SHA256:
+  27e7d98aa8d78a7bb96b85ae02778a1ecbaa7b57046fa07e36a3afcbcb2de6f4.
+
 ## 2026-10-01 — Knowledge base audit
 **What**: Brought the knowledge base back in line with the code, the remote and production.
 **Why**: Owner request. Production, the database and two owner commits had moved on without

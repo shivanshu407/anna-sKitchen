@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url('/fonts/inter-latin-variable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('/fonts/outfit-latin-variable.woff2') format('woff2');
+}
+
 @theme {
   --color-primary: #C5A04E;
   --color-primary-dark: #A8863A;

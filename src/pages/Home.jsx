@@ -14,12 +14,10 @@ import FAQ from '../components/FAQ';
 import CTA from '../components/CTA';
 import Footer from '../components/Footer';
 import PartnerSlider from '../components/PartnerSlider';
-import SEO from '../components/SEO';
 
 const Home = () => {
     return (
         <>
-            <SEO title="Commercial Kitchen Equipment Manufacturer in Surat" description="AK Sales manufactures and supplies commercial kitchen equipment in Surat for hotels, restaurants, cafes, bakeries and cloud kitchens." />
             <Hero />
             <ClientSlider />
             <About />

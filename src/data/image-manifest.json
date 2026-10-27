@@ -1,0 +1,488 @@
+{
+  "/blog/download.webp": {
+    "width": 318,
+    "height": 159,
+    "srcSet": "/responsive/blog/download-160w.webp 160w, /responsive/blog/download-318w.webp 318w"
+  },
+  "/blog/images-4.webp": {
+    "width": 299,
+    "height": 168,
+    "srcSet": "/responsive/blog/images-4-160w.webp 160w, /responsive/blog/images-4-299w.webp 299w"
+  },
+  "/blog/istockphoto-471711877-612x612.webp": {
+    "width": 612,
+    "height": 408,
+    "srcSet": "/responsive/blog/istockphoto-471711877-612x612-160w.webp 160w, /responsive/blog/istockphoto-471711877-612x612-480w.webp 480w, /responsive/blog/istockphoto-471711877-612x612-612w.webp 612w"
+  },
+  "/blog/professional-stainless-steel-kitchen-design-photo-was-made-restouraunt-613910-12332.webp": {
+    "width": 740,
+    "height": 494,
+    "srcSet": "/responsive/blog/professional-stainless-steel-kitchen-design-photo-was-made-restouraunt-613910-12332-160w.webp 160w, /responsive/blog/professional-stainless-steel-kitchen-design-photo-was-made-restouraunt-613910-12332-480w.webp 480w, /responsive/blog/professional-stainless-steel-kitchen-design-photo-was-made-restouraunt-613910-12332-740w.webp 740w"
+  },
+  "/clients/487824977-122233010432025315-6264959669572713421-n.webp": {
+    "width": 200,
+    "height": 200,
+    "srcSet": "/responsive/clients/487824977-122233010432025315-6264959669572713421-n-160w.webp 160w, /responsive/clients/487824977-122233010432025315-6264959669572713421-n-200w.webp 200w"
+  },
+  "/clients/amul-official-logo.svg": {
+    "width": 400,
+    "height": 249
+  },
+  "/clients/atul-bakery-logo-new.svg": {
+    "width": 211,
+    "height": 58
+  },
+  "/clients/download-1.webp": {
+    "width": 56,
+    "height": 56,
+    "srcSet": "/responsive/clients/download-1-56w.webp 56w"
+  },
+  "/clients/haldiram-logo-9gn.webp": {
+    "width": 170,
+    "height": 100,
+    "srcSet": "/responsive/clients/haldiram-logo-9gn-160w.webp 160w, /responsive/clients/haldiram-logo-9gn-170w.webp 170w"
+  },
+  "/clients/irctc.webp": {
+    "width": 400,
+    "height": 496,
+    "srcSet": "/responsive/clients/irctc-160w.webp 160w, /responsive/clients/irctc-400w.webp 400w"
+  },
+  "/clients/logo-1.webp": {
+    "width": 280,
+    "height": 100,
+    "srcSet": "/responsive/clients/logo-1-160w.webp 160w, /responsive/clients/logo-1-280w.webp 280w"
+  },
+  "/clients/logo.webp": {
+    "width": 400,
+    "height": 197,
+    "srcSet": "/responsive/clients/logo-160w.webp 160w, /responsive/clients/logo-400w.webp 400w"
+  },
+  "/clients/subway-logo-e7b602efa8e0c7316077.webp": {
+    "width": 400,
+    "height": 185,
+    "srcSet": "/responsive/clients/subway-logo-e7b602efa8e0c7316077-160w.webp 160w, /responsive/clients/subway-logo-e7b602efa8e0c7316077-400w.webp 400w"
+  },
+  "/clients/sumul-dairy-logo.webp": {
+    "width": 200,
+    "height": 200,
+    "srcSet": "/responsive/clients/sumul-dairy-logo-160w.webp 160w, /responsive/clients/sumul-dairy-logo-200w.webp 200w"
+  },
+  "/clients/unnamed-2.webp": {
+    "width": 400,
+    "height": 400,
+    "srcSet": "/responsive/clients/unnamed-2-160w.webp 160w, /responsive/clients/unnamed-2-400w.webp 400w"
+  },
+  "/clients/unnamed.webp": {
+    "width": 152,
+    "height": 60,
+    "srcSet": "/responsive/clients/unnamed-152w.webp 152w"
+  },
+  "/clients/whatsapp-image-2026-02-26-at-17-33-43-1.webp": {
+    "width": 400,
+    "height": 311,
+    "srcSet": "/responsive/clients/whatsapp-image-2026-02-26-at-17-33-43-1-160w.webp 160w, /responsive/clients/whatsapp-image-2026-02-26-at-17-33-43-1-400w.webp 400w"
+  },
+  "/clients/whatsapp-image-2026-02-26-at-17-33-43.webp": {
+    "width": 400,
+    "height": 288,
+    "srcSet": "/responsive/clients/whatsapp-image-2026-02-26-at-17-33-43-160w.webp 160w, /responsive/clients/whatsapp-image-2026-02-26-at-17-33-43-400w.webp 400w"
+  },
+  "/images/a1.webp": {
+    "width": 1280,
+    "height": 728,
+    "srcSet": "/responsive/images/a1-160w.webp 160w, /responsive/images/a1-480w.webp 480w, /responsive/images/a1-960w.webp 960w, /responsive/images/a1-1280w.webp 1280w"
+  },
+  "/images/a2.webp": {
+    "width": 1200,
+    "height": 1400,
+    "srcSet": "/responsive/images/a2-160w.webp 160w, /responsive/images/a2-480w.webp 480w, /responsive/images/a2-960w.webp 960w, /responsive/images/a2-1200w.webp 1200w"
+  },
+  "/images/a3.webp": {
+    "width": 1280,
+    "height": 728,
+    "srcSet": "/responsive/images/a3-160w.webp 160w, /responsive/images/a3-480w.webp 480w, /responsive/images/a3-960w.webp 960w, /responsive/images/a3-1280w.webp 1280w"
+  },
+  "/images/ab.webp": {
+    "width": 1920,
+    "height": 1080,
+    "srcSet": "/responsive/images/ab-160w.webp 160w, /responsive/images/ab-480w.webp 480w, /responsive/images/ab-960w.webp 960w, /responsive/images/ab-1440w.webp 1440w"
+  },
+  "/images/ak-sales-logo.png": {
+    "width": 400,
+    "height": 324,
+    "srcSet": "/responsive/images/ak-sales-logo-160w.webp 160w, /responsive/images/ak-sales-logo-400w.webp 400w"
+  },
+  "/images/amul.webp": {
+    "width": 610,
+    "height": 444,
+    "srcSet": "/responsive/images/amul-160w.webp 160w, /responsive/images/amul-480w.webp 480w, /responsive/images/amul-610w.webp 610w"
+  },
+  "/images/annas-logo-1.webp": {
+    "width": 1280,
+    "height": 1107,
+    "srcSet": "/responsive/images/annas-logo-1-160w.webp 160w, /responsive/images/annas-logo-1-480w.webp 480w, /responsive/images/annas-logo-1-960w.webp 960w, /responsive/images/annas-logo-1-1280w.webp 1280w"
+  },
+  "/images/bakery-product/bengali-sweet-counter.webp": {
+    "width": 1600,
+    "height": 1282,
+    "srcSet": "/responsive/images/bakery-product/bengali-sweet-counter-160w.webp 160w, /responsive/images/bakery-product/bengali-sweet-counter-480w.webp 480w, /responsive/images/bakery-product/bengali-sweet-counter-960w.webp 960w, /responsive/images/bakery-product/bengali-sweet-counter-1440w.webp 1440w"
+  },
+  "/images/bakery-product/bread-oven.webp": {
+    "width": 1600,
+    "height": 2334,
+    "srcSet": "/responsive/images/bakery-product/bread-oven-160w.webp 160w, /responsive/images/bakery-product/bread-oven-480w.webp 480w, /responsive/images/bakery-product/bread-oven-960w.webp 960w, /responsive/images/bakery-product/bread-oven-1440w.webp 1440w"
+  },
+  "/images/bakery-product/bread-slice-cutter.webp": {
+    "width": 1600,
+    "height": 2030,
+    "srcSet": "/responsive/images/bakery-product/bread-slice-cutter-160w.webp 160w, /responsive/images/bakery-product/bread-slice-cutter-480w.webp 480w, /responsive/images/bakery-product/bread-slice-cutter-960w.webp 960w, /responsive/images/bakery-product/bread-slice-cutter-1440w.webp 1440w"
+  },
+  "/images/bakery-product/cold-display-counter.webp": {
+    "width": 1600,
+    "height": 1475,
+    "srcSet": "/responsive/images/bakery-product/cold-display-counter-160w.webp 160w, /responsive/images/bakery-product/cold-display-counter-480w.webp 480w, /responsive/images/bakery-product/cold-display-counter-960w.webp 960w, /responsive/images/bakery-product/cold-display-counter-1440w.webp 1440w"
+  },
+  "/images/bakery-product/spiral-mixer-machine.webp": {
+    "width": 1600,
+    "height": 2132,
+    "srcSet": "/responsive/images/bakery-product/spiral-mixer-machine-160w.webp 160w, /responsive/images/bakery-product/spiral-mixer-machine-480w.webp 480w, /responsive/images/bakery-product/spiral-mixer-machine-960w.webp 960w, /responsive/images/bakery-product/spiral-mixer-machine-1440w.webp 1440w"
+  },
+  "/images/bakery-product/square-display-counter.webp": {
+    "width": 1600,
+    "height": 1386,
+    "srcSet": "/responsive/images/bakery-product/square-display-counter-160w.webp 160w, /responsive/images/bakery-product/square-display-counter-480w.webp 480w, /responsive/images/bakery-product/square-display-counter-960w.webp 960w, /responsive/images/bakery-product/square-display-counter-1440w.webp 1440w"
+  },
+  "/images/chaat-and-fast-food-counter/chaat-counter-1.webp": {
+    "width": 1600,
+    "height": 1816,
+    "srcSet": "/responsive/images/chaat-and-fast-food-counter/chaat-counter-1-160w.webp 160w, /responsive/images/chaat-and-fast-food-counter/chaat-counter-1-480w.webp 480w, /responsive/images/chaat-and-fast-food-counter/chaat-counter-1-960w.webp 960w, /responsive/images/chaat-and-fast-food-counter/chaat-counter-1-1440w.webp 1440w"
+  },
+  "/images/chaat-and-fast-food-counter/chaat-counter-2.webp": {
+    "width": 1600,
+    "height": 1210,
+    "srcSet": "/responsive/images/chaat-and-fast-food-counter/chaat-counter-2-160w.webp 160w, /responsive/images/chaat-and-fast-food-counter/chaat-counter-2-480w.webp 480w, /responsive/images/chaat-and-fast-food-counter/chaat-counter-2-960w.webp 960w, /responsive/images/chaat-and-fast-food-counter/chaat-counter-2-1440w.webp 1440w"
+  },
+  "/images/chaat-and-fast-food-counter/pani-puri-counter.webp": {
+    "width": 1600,
+    "height": 1944,
+    "srcSet": "/responsive/images/chaat-and-fast-food-counter/pani-puri-counter-160w.webp 160w, /responsive/images/chaat-and-fast-food-counter/pani-puri-counter-480w.webp 480w, /responsive/images/chaat-and-fast-food-counter/pani-puri-counter-960w.webp 960w, /responsive/images/chaat-and-fast-food-counter/pani-puri-counter-1440w.webp 1440w"
+  },
+  "/images/chaat-and-fast-food-counter/pav-bhaji-counter.webp": {
+    "width": 1600,
+    "height": 1599,
+    "srcSet": "/responsive/images/chaat-and-fast-food-counter/pav-bhaji-counter-160w.webp 160w, /responsive/images/chaat-and-fast-food-counter/pav-bhaji-counter-480w.webp 480w, /responsive/images/chaat-and-fast-food-counter/pav-bhaji-counter-960w.webp 960w, /responsive/images/chaat-and-fast-food-counter/pav-bhaji-counter-1440w.webp 1440w"
+  },
+  "/images/haldiram.webp": {
+    "width": 1200,
+    "height": 1200,
+    "srcSet": "/responsive/images/haldiram-160w.webp 160w, /responsive/images/haldiram-480w.webp 480w, /responsive/images/haldiram-960w.webp 960w, /responsive/images/haldiram-1200w.webp 1200w"
+  },
+  "/images/heating-range/dosa-bhatti.webp": {
+    "width": 1600,
+    "height": 862,
+    "srcSet": "/responsive/images/heating-range/dosa-bhatti-160w.webp 160w, /responsive/images/heating-range/dosa-bhatti-480w.webp 480w, /responsive/images/heating-range/dosa-bhatti-960w.webp 960w, /responsive/images/heating-range/dosa-bhatti-1440w.webp 1440w"
+  },
+  "/images/heating-range/drum-tandoor.webp": {
+    "width": 1600,
+    "height": 1950,
+    "srcSet": "/responsive/images/heating-range/drum-tandoor-160w.webp 160w, /responsive/images/heating-range/drum-tandoor-480w.webp 480w, /responsive/images/heating-range/drum-tandoor-960w.webp 960w, /responsive/images/heating-range/drum-tandoor-1440w.webp 1440w"
+  },
+  "/images/heating-range/hot-bain-marie.webp": {
+    "width": 1600,
+    "height": 710,
+    "srcSet": "/responsive/images/heating-range/hot-bain-marie-160w.webp 160w, /responsive/images/heating-range/hot-bain-marie-480w.webp 480w, /responsive/images/heating-range/hot-bain-marie-960w.webp 960w, /responsive/images/heating-range/hot-bain-marie-1440w.webp 1440w"
+  },
+  "/images/heating-range/kadai-fryer.webp": {
+    "width": 1600,
+    "height": 1621,
+    "srcSet": "/responsive/images/heating-range/kadai-fryer-160w.webp 160w, /responsive/images/heating-range/kadai-fryer-480w.webp 480w, /responsive/images/heating-range/kadai-fryer-960w.webp 960w, /responsive/images/heating-range/kadai-fryer-1440w.webp 1440w"
+  },
+  "/images/heating-range/roti-puffer.webp": {
+    "width": 1600,
+    "height": 1547,
+    "srcSet": "/responsive/images/heating-range/roti-puffer-160w.webp 160w, /responsive/images/heating-range/roti-puffer-480w.webp 480w, /responsive/images/heating-range/roti-puffer-960w.webp 960w, /responsive/images/heating-range/roti-puffer-1440w.webp 1440w"
+  },
+  "/images/heating-range/single-burner-gas-range.webp": {
+    "width": 1600,
+    "height": 2199,
+    "srcSet": "/responsive/images/heating-range/single-burner-gas-range-160w.webp 160w, /responsive/images/heating-range/single-burner-gas-range-480w.webp 480w, /responsive/images/heating-range/single-burner-gas-range-960w.webp 960w, /responsive/images/heating-range/single-burner-gas-range-1440w.webp 1440w"
+  },
+  "/images/heating-range/tank-tandoor.webp": {
+    "width": 1600,
+    "height": 1698,
+    "srcSet": "/responsive/images/heating-range/tank-tandoor-160w.webp 160w, /responsive/images/heating-range/tank-tandoor-480w.webp 480w, /responsive/images/heating-range/tank-tandoor-960w.webp 960w, /responsive/images/heating-range/tank-tandoor-1440w.webp 1440w"
+  },
+  "/images/heating-range/three-burner-chinese-gas.webp": {
+    "width": 1600,
+    "height": 1272,
+    "srcSet": "/responsive/images/heating-range/three-burner-chinese-gas-160w.webp 160w, /responsive/images/heating-range/three-burner-chinese-gas-480w.webp 480w, /responsive/images/heating-range/three-burner-chinese-gas-960w.webp 960w, /responsive/images/heating-range/three-burner-chinese-gas-1440w.webp 1440w"
+  },
+  "/images/heating-range/three-burner-indian-gas.webp": {
+    "width": 1600,
+    "height": 1076,
+    "srcSet": "/responsive/images/heating-range/three-burner-indian-gas-160w.webp 160w, /responsive/images/heating-range/three-burner-indian-gas-480w.webp 480w, /responsive/images/heating-range/three-burner-indian-gas-960w.webp 960w, /responsive/images/heating-range/three-burner-indian-gas-1440w.webp 1440w"
+  },
+  "/images/heating-range/two-burner-indian.webp": {
+    "width": 1600,
+    "height": 1592,
+    "srcSet": "/responsive/images/heating-range/two-burner-indian-160w.webp 160w, /responsive/images/heating-range/two-burner-indian-480w.webp 480w, /responsive/images/heating-range/two-burner-indian-960w.webp 960w, /responsive/images/heating-range/two-burner-indian-1440w.webp 1440w"
+  },
+  "/images/palsana.webp": {
+    "width": 800,
+    "height": 428,
+    "srcSet": "/responsive/images/palsana-160w.webp 160w, /responsive/images/palsana-480w.webp 480w, /responsive/images/palsana-800w.webp 800w"
+  },
+  "/images/processing/coffee-beans-grinder.webp": {
+    "width": 1600,
+    "height": 1897,
+    "srcSet": "/responsive/images/processing/coffee-beans-grinder-160w.webp 160w, /responsive/images/processing/coffee-beans-grinder-480w.webp 480w, /responsive/images/processing/coffee-beans-grinder-960w.webp 960w, /responsive/images/processing/coffee-beans-grinder-1440w.webp 1440w"
+  },
+  "/images/processing/coffee-machine.webp": {
+    "width": 1600,
+    "height": 1302,
+    "srcSet": "/responsive/images/processing/coffee-machine-160w.webp 160w, /responsive/images/processing/coffee-machine-480w.webp 480w, /responsive/images/processing/coffee-machine-960w.webp 960w, /responsive/images/processing/coffee-machine-1440w.webp 1440w"
+  },
+  "/images/processing/grilled-machine.webp": {
+    "width": 1600,
+    "height": 1729,
+    "srcSet": "/responsive/images/processing/grilled-machine-160w.webp 160w, /responsive/images/processing/grilled-machine-480w.webp 480w, /responsive/images/processing/grilled-machine-960w.webp 960w, /responsive/images/processing/grilled-machine-1440w.webp 1440w"
+  },
+  "/images/processing/heavy-duty-exhaust-fan.webp": {
+    "width": 1600,
+    "height": 1586,
+    "srcSet": "/responsive/images/processing/heavy-duty-exhaust-fan-160w.webp 160w, /responsive/images/processing/heavy-duty-exhaust-fan-480w.webp 480w, /responsive/images/processing/heavy-duty-exhaust-fan-960w.webp 960w, /responsive/images/processing/heavy-duty-exhaust-fan-1440w.webp 1440w"
+  },
+  "/images/processing/ice-blender.webp": {
+    "width": 1600,
+    "height": 3002,
+    "srcSet": "/responsive/images/processing/ice-blender-160w.webp 160w, /responsive/images/processing/ice-blender-480w.webp 480w, /responsive/images/processing/ice-blender-960w.webp 960w, /responsive/images/processing/ice-blender-1440w.webp 1440w"
+  },
+  "/images/processing/idli-steamer.webp": {
+    "width": 1600,
+    "height": 1793,
+    "srcSet": "/responsive/images/processing/idli-steamer-160w.webp 160w, /responsive/images/processing/idli-steamer-480w.webp 480w, /responsive/images/processing/idli-steamer-960w.webp 960w, /responsive/images/processing/idli-steamer-1440w.webp 1440w"
+  },
+  "/images/processing/meat-mincer.webp": {
+    "width": 1600,
+    "height": 1869,
+    "srcSet": "/responsive/images/processing/meat-mincer-160w.webp 160w, /responsive/images/processing/meat-mincer-480w.webp 480w, /responsive/images/processing/meat-mincer-960w.webp 960w, /responsive/images/processing/meat-mincer-1440w.webp 1440w"
+  },
+  "/images/processing/pizza-gas-oven.webp": {
+    "width": 1600,
+    "height": 885,
+    "srcSet": "/responsive/images/processing/pizza-gas-oven-160w.webp 160w, /responsive/images/processing/pizza-gas-oven-480w.webp 480w, /responsive/images/processing/pizza-gas-oven-960w.webp 960w, /responsive/images/processing/pizza-gas-oven-1440w.webp 1440w"
+  },
+  "/images/processing/pizza-oven.webp": {
+    "width": 1600,
+    "height": 728,
+    "srcSet": "/responsive/images/processing/pizza-oven-160w.webp 160w, /responsive/images/processing/pizza-oven-480w.webp 480w, /responsive/images/processing/pizza-oven-960w.webp 960w, /responsive/images/processing/pizza-oven-1440w.webp 1440w"
+  },
+  "/images/processing/plate-induction-stove.webp": {
+    "width": 1600,
+    "height": 1077,
+    "srcSet": "/responsive/images/processing/plate-induction-stove-160w.webp 160w, /responsive/images/processing/plate-induction-stove-480w.webp 480w, /responsive/images/processing/plate-induction-stove-960w.webp 960w, /responsive/images/processing/plate-induction-stove-1440w.webp 1440w"
+  },
+  "/images/processing/plate-warmer.webp": {
+    "width": 1600,
+    "height": 2735,
+    "srcSet": "/responsive/images/processing/plate-warmer-160w.webp 160w, /responsive/images/processing/plate-warmer-480w.webp 480w, /responsive/images/processing/plate-warmer-960w.webp 960w, /responsive/images/processing/plate-warmer-1440w.webp 1440w"
+  },
+  "/images/processing/pulveriser.webp": {
+    "width": 1600,
+    "height": 1418,
+    "srcSet": "/responsive/images/processing/pulveriser-160w.webp 160w, /responsive/images/processing/pulveriser-480w.webp 480w, /responsive/images/processing/pulveriser-960w.webp 960w, /responsive/images/processing/pulveriser-1440w.webp 1440w"
+  },
+  "/images/processing/wet-grinder.webp": {
+    "width": 1600,
+    "height": 2126,
+    "srcSet": "/responsive/images/processing/wet-grinder-160w.webp 160w, /responsive/images/processing/wet-grinder-480w.webp 480w, /responsive/images/processing/wet-grinder-960w.webp 960w, /responsive/images/processing/wet-grinder-1440w.webp 1440w"
+  },
+  "/images/rack-trolley/dish-rack.webp": {
+    "width": 1600,
+    "height": 2361,
+    "srcSet": "/responsive/images/rack-trolley/dish-rack-160w.webp 160w, /responsive/images/rack-trolley/dish-rack-480w.webp 480w, /responsive/images/rack-trolley/dish-rack-960w.webp 960w, /responsive/images/rack-trolley/dish-rack-1440w.webp 1440w"
+  },
+  "/images/rack-trolley/masala-trolley.webp": {
+    "width": 1600,
+    "height": 1809,
+    "srcSet": "/responsive/images/rack-trolley/masala-trolley-160w.webp 160w, /responsive/images/rack-trolley/masala-trolley-480w.webp 480w, /responsive/images/rack-trolley/masala-trolley-960w.webp 960w, /responsive/images/rack-trolley/masala-trolley-1440w.webp 1440w"
+  },
+  "/images/rack-trolley/pipe-pot-rack.webp": {
+    "width": 1600,
+    "height": 2071,
+    "srcSet": "/responsive/images/rack-trolley/pipe-pot-rack-160w.webp 160w, /responsive/images/rack-trolley/pipe-pot-rack-480w.webp 480w, /responsive/images/rack-trolley/pipe-pot-rack-960w.webp 960w, /responsive/images/rack-trolley/pipe-pot-rack-1440w.webp 1440w"
+  },
+  "/images/rack-trolley/service-trolley.webp": {
+    "width": 1600,
+    "height": 1669,
+    "srcSet": "/responsive/images/rack-trolley/service-trolley-160w.webp 160w, /responsive/images/rack-trolley/service-trolley-480w.webp 480w, /responsive/images/rack-trolley/service-trolley-960w.webp 960w, /responsive/images/rack-trolley/service-trolley-1440w.webp 1440w"
+  },
+  "/images/rack-trolley/storage-rack.webp": {
+    "width": 1600,
+    "height": 2008,
+    "srcSet": "/responsive/images/rack-trolley/storage-rack-160w.webp 160w, /responsive/images/rack-trolley/storage-rack-480w.webp 480w, /responsive/images/rack-trolley/storage-rack-960w.webp 960w, /responsive/images/rack-trolley/storage-rack-1440w.webp 1440w"
+  },
+  "/images/rack-trolley/tray-slide-trolley.webp": {
+    "width": 1406,
+    "height": 2806,
+    "srcSet": "/responsive/images/rack-trolley/tray-slide-trolley-160w.webp 160w, /responsive/images/rack-trolley/tray-slide-trolley-480w.webp 480w, /responsive/images/rack-trolley/tray-slide-trolley-960w.webp 960w, /responsive/images/rack-trolley/tray-slide-trolley-1406w.webp 1406w"
+  },
+  "/images/refrigeration/cold-bain-marie.webp": {
+    "width": 1600,
+    "height": 1498,
+    "srcSet": "/responsive/images/refrigeration/cold-bain-marie-160w.webp 160w, /responsive/images/refrigeration/cold-bain-marie-480w.webp 480w, /responsive/images/refrigeration/cold-bain-marie-960w.webp 960w, /responsive/images/refrigeration/cold-bain-marie-1440w.webp 1440w"
+  },
+  "/images/refrigeration/double-top-door-chest-deep-freezer.webp": {
+    "width": 1600,
+    "height": 1370,
+    "srcSet": "/responsive/images/refrigeration/double-top-door-chest-deep-freezer-160w.webp 160w, /responsive/images/refrigeration/double-top-door-chest-deep-freezer-480w.webp 480w, /responsive/images/refrigeration/double-top-door-chest-deep-freezer-960w.webp 960w, /responsive/images/refrigeration/double-top-door-chest-deep-freezer-1440w.webp 1440w"
+  },
+  "/images/refrigeration/four-door-refrigerator.webp": {
+    "width": 1600,
+    "height": 2145,
+    "srcSet": "/responsive/images/refrigeration/four-door-refrigerator-160w.webp 160w, /responsive/images/refrigeration/four-door-refrigerator-480w.webp 480w, /responsive/images/refrigeration/four-door-refrigerator-960w.webp 960w, /responsive/images/refrigeration/four-door-refrigerator-1440w.webp 1440w"
+  },
+  "/images/refrigeration/ice-cube-machine.webp": {
+    "width": 1600,
+    "height": 2127,
+    "srcSet": "/responsive/images/refrigeration/ice-cube-machine-160w.webp 160w, /responsive/images/refrigeration/ice-cube-machine-480w.webp 480w, /responsive/images/refrigeration/ice-cube-machine-960w.webp 960w, /responsive/images/refrigeration/ice-cube-machine-1440w.webp 1440w"
+  },
+  "/images/refrigeration/pizza-makeline.webp": {
+    "width": 1600,
+    "height": 1302,
+    "srcSet": "/responsive/images/refrigeration/pizza-makeline-160w.webp 160w, /responsive/images/refrigeration/pizza-makeline-480w.webp 480w, /responsive/images/refrigeration/pizza-makeline-960w.webp 960w, /responsive/images/refrigeration/pizza-makeline-1440w.webp 1440w"
+  },
+  "/images/refrigeration/softy-machine.webp": {
+    "width": 1600,
+    "height": 2536,
+    "srcSet": "/responsive/images/refrigeration/softy-machine-160w.webp 160w, /responsive/images/refrigeration/softy-machine-480w.webp 480w, /responsive/images/refrigeration/softy-machine-960w.webp 960w, /responsive/images/refrigeration/softy-machine-1440w.webp 1440w"
+  },
+  "/images/refrigeration/table-top-refrigerator.webp": {
+    "width": 1600,
+    "height": 875,
+    "srcSet": "/responsive/images/refrigeration/table-top-refrigerator-160w.webp 160w, /responsive/images/refrigeration/table-top-refrigerator-480w.webp 480w, /responsive/images/refrigeration/table-top-refrigerator-960w.webp 960w, /responsive/images/refrigeration/table-top-refrigerator-1440w.webp 1440w"
+  },
+  "/images/refrigeration/two-door-refrigerator.webp": {
+    "width": 1394,
+    "height": 2470,
+    "srcSet": "/responsive/images/refrigeration/two-door-refrigerator-160w.webp 160w, /responsive/images/refrigeration/two-door-refrigerator-480w.webp 480w, /responsive/images/refrigeration/two-door-refrigerator-960w.webp 960w, /responsive/images/refrigeration/two-door-refrigerator-1394w.webp 1394w"
+  },
+  "/images/refrigeration/upright-beverage-coolers.webp": {
+    "width": 1052,
+    "height": 2446,
+    "srcSet": "/responsive/images/refrigeration/upright-beverage-coolers-160w.webp 160w, /responsive/images/refrigeration/upright-beverage-coolers-480w.webp 480w, /responsive/images/refrigeration/upright-beverage-coolers-960w.webp 960w, /responsive/images/refrigeration/upright-beverage-coolers-1052w.webp 1052w"
+  },
+  "/images/refrigeration/water-cooler.webp": {
+    "width": 1600,
+    "height": 2568,
+    "srcSet": "/responsive/images/refrigeration/water-cooler-160w.webp 160w, /responsive/images/refrigeration/water-cooler-480w.webp 480w, /responsive/images/refrigeration/water-cooler-960w.webp 960w, /responsive/images/refrigeration/water-cooler-1440w.webp 1440w"
+  },
+  "/images/subway.webp": {
+    "width": 1600,
+    "height": 1021,
+    "srcSet": "/responsive/images/subway-160w.webp 160w, /responsive/images/subway-480w.webp 480w, /responsive/images/subway-960w.webp 960w, /responsive/images/subway-1440w.webp 1440w"
+  },
+  "/images/work-and-professyion-table/cash-drawer.webp": {
+    "width": 1600,
+    "height": 2115,
+    "srcSet": "/responsive/images/work-and-professyion-table/cash-drawer-160w.webp 160w, /responsive/images/work-and-professyion-table/cash-drawer-480w.webp 480w, /responsive/images/work-and-professyion-table/cash-drawer-960w.webp 960w, /responsive/images/work-and-professyion-table/cash-drawer-1440w.webp 1440w"
+  },
+  "/images/work-and-professyion-table/drawer-with-storage-table.webp": {
+    "width": 1600,
+    "height": 1202,
+    "srcSet": "/responsive/images/work-and-professyion-table/drawer-with-storage-table-160w.webp 160w, /responsive/images/work-and-professyion-table/drawer-with-storage-table-480w.webp 480w, /responsive/images/work-and-professyion-table/drawer-with-storage-table-960w.webp 960w, /responsive/images/work-and-professyion-table/drawer-with-storage-table-1440w.webp 1440w"
+  },
+  "/images/work-and-professyion-table/pick-up-counter.webp": {
+    "width": 1600,
+    "height": 2156,
+    "srcSet": "/responsive/images/work-and-professyion-table/pick-up-counter-160w.webp 160w, /responsive/images/work-and-professyion-table/pick-up-counter-480w.webp 480w, /responsive/images/work-and-professyion-table/pick-up-counter-960w.webp 960w, /responsive/images/work-and-professyion-table/pick-up-counter-1440w.webp 1440w"
+  },
+  "/images/work-and-professyion-table/restaurant-table.webp": {
+    "width": 1600,
+    "height": 1070,
+    "srcSet": "/responsive/images/work-and-professyion-table/restaurant-table-160w.webp 160w, /responsive/images/work-and-professyion-table/restaurant-table-480w.webp 480w, /responsive/images/work-and-professyion-table/restaurant-table-960w.webp 960w, /responsive/images/work-and-professyion-table/restaurant-table-1440w.webp 1440w"
+  },
+  "/images/work-and-professyion-table/service-table.webp": {
+    "width": 1600,
+    "height": 1247,
+    "srcSet": "/responsive/images/work-and-professyion-table/service-table-160w.webp 160w, /responsive/images/work-and-professyion-table/service-table-480w.webp 480w, /responsive/images/work-and-professyion-table/service-table-960w.webp 960w, /responsive/images/work-and-professyion-table/service-table-1440w.webp 1440w"
+  },
+  "/images/work-and-professyion-table/single-sink.webp": {
+    "width": 1600,
+    "height": 1892,
+    "srcSet": "/responsive/images/work-and-professyion-table/single-sink-160w.webp 160w, /responsive/images/work-and-professyion-table/single-sink-480w.webp 480w, /responsive/images/work-and-professyion-table/single-sink-960w.webp 960w, /responsive/images/work-and-professyion-table/single-sink-1440w.webp 1440w"
+  },
+  "/images/work-and-professyion-table/sink-with-table.webp": {
+    "width": 1600,
+    "height": 1621,
+    "srcSet": "/responsive/images/work-and-professyion-table/sink-with-table-160w.webp 160w, /responsive/images/work-and-professyion-table/sink-with-table-480w.webp 480w, /responsive/images/work-and-professyion-table/sink-with-table-960w.webp 960w, /responsive/images/work-and-professyion-table/sink-with-table-1440w.webp 1440w"
+  },
+  "/images/work-and-professyion-table/three-sinks-table.webp": {
+    "width": 1600,
+    "height": 1167,
+    "srcSet": "/responsive/images/work-and-professyion-table/three-sinks-table-160w.webp 160w, /responsive/images/work-and-professyion-table/three-sinks-table-480w.webp 480w, /responsive/images/work-and-professyion-table/three-sinks-table-960w.webp 960w, /responsive/images/work-and-professyion-table/three-sinks-table-1440w.webp 1440w"
+  },
+  "/images/work-and-professyion-table/three-step-work.webp": {
+    "width": 1600,
+    "height": 1005,
+    "srcSet": "/responsive/images/work-and-professyion-table/three-step-work-160w.webp 160w, /responsive/images/work-and-professyion-table/three-step-work-480w.webp 480w, /responsive/images/work-and-professyion-table/three-step-work-960w.webp 960w, /responsive/images/work-and-professyion-table/three-step-work-1440w.webp 1440w"
+  },
+  "/images/work-and-professyion-table/work-table-with-drawer.webp": {
+    "width": 1600,
+    "height": 1248,
+    "srcSet": "/responsive/images/work-and-professyion-table/work-table-with-drawer-160w.webp 160w, /responsive/images/work-and-professyion-table/work-table-with-drawer-480w.webp 480w, /responsive/images/work-and-professyion-table/work-table-with-drawer-960w.webp 960w, /responsive/images/work-and-professyion-table/work-table-with-drawer-1440w.webp 1440w"
+  },
+  "/images/work-and-professyion-table/work-table.webp": {
+    "width": 1600,
+    "height": 1316,
+    "srcSet": "/responsive/images/work-and-professyion-table/work-table-160w.webp 160w, /responsive/images/work-and-professyion-table/work-table-480w.webp 480w, /responsive/images/work-and-professyion-table/work-table-960w.webp 960w, /responsive/images/work-and-professyion-table/work-table-1440w.webp 1440w"
+  },
+  "/images/work-and-professyion-table/work-with-storage-table.webp": {
+    "width": 1600,
+    "height": 1226,
+    "srcSet": "/responsive/images/work-and-professyion-table/work-with-storage-table-160w.webp 160w, /responsive/images/work-and-professyion-table/work-with-storage-table-480w.webp 480w, /responsive/images/work-and-professyion-table/work-with-storage-table-960w.webp 960w, /responsive/images/work-and-professyion-table/work-with-storage-table-1440w.webp 1440w"
+  },
+  "/partners/butler.webp": {
+    "width": 303,
+    "height": 107,
+    "srcSet": "/responsive/partners/butler-160w.webp 160w, /responsive/partners/butler-303w.webp 303w"
+  },
+  "/partners/cellfrost.webp": {
+    "width": 1600,
+    "height": 130,
+    "srcSet": "/responsive/partners/cellfrost-160w.webp 160w, /responsive/partners/cellfrost-480w.webp 480w, /responsive/partners/cellfrost-960w.webp 960w, /responsive/partners/cellfrost-1440w.webp 1440w"
+  },
+  "/partners/ezycoock.webp": {
+    "width": 260,
+    "height": 87,
+    "srcSet": "/responsive/partners/ezycoock-160w.webp 160w, /responsive/partners/ezycoock-260w.webp 260w"
+  },
+  "/partners/rational.svg": {
+    "width": 1024,
+    "height": 266
+  },
+  "/partners/rockwell.webp": {
+    "width": 230,
+    "height": 53,
+    "srcSet": "/responsive/partners/rockwell-160w.webp 160w, /responsive/partners/rockwell-230w.webp 230w"
+  },
+  "/partners/trufrost.webp": {
+    "width": 342,
+    "height": 72,
+    "srcSet": "/responsive/partners/trufrost-160w.webp 160w, /responsive/partners/trufrost-342w.webp 342w"
+  },
+  "/partners/vitamix.webp": {
+    "width": 1600,
+    "height": 421,
+    "srcSet": "/responsive/partners/vitamix-160w.webp 160w, /responsive/partners/vitamix-480w.webp 480w, /responsive/partners/vitamix-960w.webp 960w, /responsive/partners/vitamix-1440w.webp 1440w"
+  },
+  "/partners/western.webp": {
+    "width": 512,
+    "height": 256,
+    "srcSet": "/responsive/partners/western-160w.webp 160w, /responsive/partners/western-480w.webp 480w, /responsive/partners/western-512w.webp 512w"
+  },
+  "/vite.svg": {
+    "width": 32,
+    "height": 32
+  }
+}

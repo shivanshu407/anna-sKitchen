@@ -1,56 +1,45 @@
 # SEO, Analytics & Search Console
 
 ## What this subsystem does
-Controls what search engines and browser tabs show for each page, and reports traffic to
-Google Analytics. Added by the repo owner (MBKANERIYA) on 2026-09-08 and 2026-09-10;
-adjusted during the AK Sales rebrand on 2026-09-29.
+Defines crawlable AK Sales pages for the canonical origin https://aksales.in. Metadata and public content are present in the initial HTML and remain consistent during browser navigation. The owner deployed the final release on 2026-10-02; live crawler endpoints, route statuses and old-domain redirects were verified. Search Console migration remains pending.
 
 ## How it is structured
-| Piece | Where | Role |
-|-------|-------|------|
-| Site-wide `<title>` and `<meta name="description">` | `index.html` | What crawlers see before JavaScript runs, and the default on pages without `<SEO>` |
-| `<SEO>` component | `src/components/SEO.jsx` | Per-page title (`"<title> \| AK Sales"`), description, keywords, via `react-helmet-async` |
-| `HelmetProvider` | `src/main.jsx` | Required wrapper for `<SEO>` |
-| Google Analytics (gtag.js) | `index.html` | Measurement ID `G-EZE8DTQTEB`, loaded on every page |
-| Google site verification | `index.html` `<meta name="google-site-verification">` | Proves ownership of the domain the page is served from |
-
-Pages that set `<SEO>`: Home, Collections, a single collection, Blogs, a single blog post,
-Admin Dashboard. All others (About, Services, Projects, Contact, product detail, admin login)
-show the `index.html` title and description.
+| Piece | Location | Responsibility |
+|---|---|---|
+| Shared route resolver | src/lib/seo.js | Titles, descriptions, canonical paths, indexability, schema and sitemap |
+| Single metadata owner | src/components/SEO.jsx, mounted in App | Helmet metadata, Open Graph, Twitter and safely serialized JSON-LD |
+| Initial HTML | src/entry-server.jsx, server/web.js | Server-rendered head/body and matching catalogue bootstrap |
+| Crawler endpoints | server/web.js | Real text/plain robots.txt and application/xml sitemap.xml |
+| Host normalization | server/index.js | HTTP/www aksales.in to HTTPS apex, index.html and legacy brochure aliases |
+| Analytics | index.html | Existing GA4 ID G-EZE8DTQTEB and existing verification tag retained |
 
 ## Conventions and rules
-- **Name and city:** "AK Sales", Surat. `src/branding.test.js` fails the build if "Anna
-  Kitchen" or "Lucknow" appears in `<head>` or anywhere in shipped code.
-- **The Home page `<SEO>` title must be descriptive, not "Home".** `<SEO>` replaces the
-  `index.html` title once React loads, so the Home `<SEO>` title is what JavaScript-running
-  crawlers index. A test enforces that it is not "Home" and names Surat.
-- **Keep the `index.html` title and description meaningful.** They are what non-JavaScript
-  crawlers and social previews read, and the fallback for every page without `<SEO>`.
-- One Analytics ID covers any domain — nothing changes in code for the move to aksales.in.
+- Business name AK Sales, Surat; canonical origin is fixed, independent of the incoming Host header. Queries do not enter canonical URLs.
+- All seven static public routes and valid product/blog routes have specific titles/descriptions. Schema uses the business contact/address already present on the site, breadcrumbs, products and articles.
+- Do not invent prices, availability, reviews, ratings, coordinates, opening hours or publication dates. Product markup without offers/reviews is not a promise of Google product rich results.
+- Keep existing category, encoded product-name and blog URLs during the domain migration, including the legacy Lucknow blog slug. Normalize trailing slashes and product-name casing with 301s while preserving query strings.
+- Missing pages and files return 404. Admin pages, APIs, PDFs and empty collections are noindex; admin/API and empty categories stay out of the sitemap. The sitemap includes only existing indexable routes and has no invented lastmod dates.
+- No database configured uses bundled content. A configured database outage returns a retryable 503 for the sitemap and unknown dynamic records, avoiding false permanent deletion signals.
+- Blog posts (2026-10-27, see blog.md): title is the post's SEO title or "<title> | AK Sales Surat"; description is meta description → summary → first paragraph. BlogPosting carries datePublished (`publishedAt` ISO, else the legacy display date), dateModified (`updatedAt`), author name/url, articleSection, keywords (tags), wordCount and articleBody. FAQPage is added only when the post has visible FAQs. Drafts are 404 and never in the sitemap; blog sitemap entries carry `lastmod` from `updatedAt` when it exists (bundled posts have none). Blog `og:image:alt` is the image alt (or title, without the brand suffix); article pages add `article:published_time`/`modified_time`.
+- SSR removes the template fallback metadata before inserting route metadata. Development fallback tags carry data-rh ownership. Keep one SEO component rather than adding page-specific copies.
+- Old-domain redirects remain a Hostinger responsibility. Activate them only after the new site works over HTTPS, preserving paths and queries.
 
 ## Known gotchas
-- **Duplicate description tags (ISSUE-014).** On pages with `<SEO>`, Helmet *adds* a second
-  `<meta name="description">` rather than replacing the one in `index.html` (verified in a
-  browser on `/collections`: two tags). Google may show either.
-- **Titles switch late on data-driven pages.** Collections renders `<SEO>` only after its
-  product fetch finishes, so the tab briefly shows the site-wide title. Harmless for search
-  engines, which wait for rendering.
-- **Client-side navigation resets correctly.** Moving from a page with `<SEO>` to one without
-  restores the `index.html` title and removes the extra description (verified).
-- **Site verification is tied to the domain serving the page.** Once annakitchenequipment.com
-  only redirects, its meta-tag verification lapses. Verify both domains in Search Console by
-  **DNS** before using Change of Address — see `deployment.md`.
-- The server dependency `helmet` (Express security headers) is unrelated to
-  `react-helmet-async` and is currently not used at all (ISSUE-015).
+React 19 hoists metadata natively; the older Helmet server context is empty. The server renders a complete document and extracts its head. JSON-LD inside the rendered body is valid. See rendering.md for the snapshot/cache contract.
+
+Search Console ownership and Change of Address require the owner's session. Verify both domain properties by DNS using their actual TXT tokens; the existing HTML verification tag does not prove the new property. Submit https://aksales.in/sitemap.xml after deployment. Keep the old domain and redirects for at least a year.
+
+Earlier on 2026-10-02 the old deployment served the old brand/city and HTML crawler files.
+The final release is now live on aksales.in, with XML/text crawler files and real 404s.
+Old-domain HTTP/HTTPS apex/www URLs return one-hop 301s with raw encoded paths and queries
+preserved (20/20 live checks). These checks do not establish indexing, rankings, field
+Core Web Vitals, Analytics delivery or rich-result eligibility. The retained email/Instagram
+and old brochure contents need owner-supplied replacements.
 
 ## How it is tested
-`src/branding.test.js`: no old name in shipped code, `index.html` title names AK Sales and
-Surat, no Lucknow in `<head>`, Home `<SEO>` title is descriptive.
-Not automated: the rendered `<head>` per page, Analytics firing, and Search Console state —
-these need a browser or Google's tools. The behaviour above was checked manually on
-2026-10-01.
+src/lib/seo.test.js covers route metadata, URLs, schema, date validation, escaping, noindex and sitemap construction. server/seo.test.js exercises real built HTML, every fallback sitemap URL, statuses, metadata uniqueness, redirects and outage semantics. src/branding.test.js guards the brand/city. Run npm test to build both bundles and run all tests.
+
+Browser verification covers hydration, metadata after navigation, mobile overflow and font loading. Local mobile Lighthouse reports are saved under output/seo; these are lab measurements, not deployed or field results. Search Console ownership, live redirects, live database content and Analytics collection remain external checks.
 
 ## Related
-- [deployment.md](deployment.md) — domain move and Search Console steps
-- [decisions.md](decisions.md) — the rebrand decision
-- [known-issues.md](known-issues.md) — ISSUE-014, ISSUE-015
+[rendering.md](rendering.md), [deployment.md](deployment.md), [assets.md](assets.md), [testing.md](testing.md), [known-issues.md](known-issues.md).

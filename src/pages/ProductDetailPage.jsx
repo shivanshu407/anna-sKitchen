@@ -1,23 +1,15 @@
-import { useState, useEffect } from 'react';
+import Image from '../components/Image';
 import { useParams, Link } from 'react-router-dom';
 import { FaHome, FaChevronRight, FaArrowRight } from 'react-icons/fa';
 import CTA from '../components/CTA';
 import ClientSlider from '../components/ClientSlider';
 import PartnerSlider from '../components/PartnerSlider';
-import { fetchProducts } from '../api/products';
+import { useSiteData } from '../lib/site-data';
 import QuoteBar from '../components/QuoteBar';
 
 const ProductDetailPage = () => {
     const { category, productName } = useParams();
-    const [productsData, setProductsData] = useState(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetchProducts().then(data => {
-            setProductsData(data);
-            setLoading(false);
-        });
-    }, []);
+    const { products: productsData, loading } = useSiteData();
 
     if (loading) {
         return (
@@ -31,7 +23,7 @@ const ProductDetailPage = () => {
     }
 
     const categoryData = productsData?.[category];
-    const decodedProductName = decodeURIComponent(productName);
+    const decodedProductName = productName;
     const product = categoryData?.products.find(
         p => p.name.toLowerCase() === decodedProductName.toLowerCase()
     );
@@ -124,7 +116,9 @@ const ProductDetailPage = () => {
                     <div className="lg:col-span-2 space-y-8">
                         {/* Product Image Box */}
                         <div className="bg-white border text-center border-gray-100 p-8 rounded-lg outline outline-1 outline-gray-200 shadow-sm flex items-center justify-center">
-                            <img
+                            <Image
+                                loading="lazy"
+                                decoding="async"
                                 src={product.image}
                                 alt={product.name}
                                 className="max-h-[300px] w-auto object-contain drop-shadow-lg"
