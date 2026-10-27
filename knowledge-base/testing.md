@@ -54,6 +54,14 @@ Added 2026-10-27 for the blog editor (see blog.md):
 | src/components/BlogContent.test.jsx, BlogArticle.test.jsx | Rendered article markup via `renderToString` |
 | src/api/blogs.test.js | FormData shape, endpoints, error surfacing |
 
+Added 2026-10-27 for catalogue editing (see catalogue.md): `server/catalogue-input.test.js`,
+`server/products-routes.test.js` (`Category`/`Blog`/Cloudinary stubbed; import uses the real
+renderer fallback data, so it needs a build), `src/lib/product-seo-check.test.js`,
+`src/api/products.test.js`, `src/pages/ProductDetailPage.test.jsx`,
+`src/pages/CollectionPage.test.jsx`, `src/components/admin/admin-editors.test.jsx`.
+`ProductDetailPage.test.jsx` sets `globalThis.React` because some shared components do not
+import React under Vitest's classic JSX transform.
+
 Components rendered in tests need `import React from 'react'` (classic JSX transform in
 Vitest). The TipTap editor has no automated test; it is verified in the browser.
 

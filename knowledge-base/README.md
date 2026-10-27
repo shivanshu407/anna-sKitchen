@@ -88,6 +88,7 @@ knowledge-base/        This documentation
 | seo.md             | Before changing titles, canonical URLs, crawler endpoints or schema |
 | rendering.md       | Before changing SSR, hydration or catalogue snapshots |
 | blog.md            | Before changing the blog editor, blog API, storage or blog pages |
+| catalogue.md       | Before changing products, categories, product URLs or their editors |
 | forms.md           | Before changing any public form or enquiry flow |
 | architecture.md    | Before touching how the app is wired          |
 | decisions.md       | Before undoing something that looks odd       |

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { SITE_URL, getPageInfo, productPath, robotsTxt, serializeJson, sitemapXml } from './seo.js';
+import { SITE_URL, getPageInfo, robotsTxt, serializeJson, sitemapXml } from './seo.js';
+import { productPath } from './catalogue.js';
 import productsData from '../data/productsData.js';
 import blogsData from '../data/blogsData.js';
 
@@ -54,10 +55,10 @@ describe('public route metadata', () => {
         expect(schemaOf(info, 'BreadcrumbList').itemListElement.at(-1).item).toBe(`${SITE_URL}/collections/empty`);
     });
 
-    it('normalises product name case to the existing encoded canonical', () => {
+    it('normalises a legacy product name URL to the slug canonical', () => {
         const info = getPageInfo('/collections/refrigeration/cold%20bain%20marie/?source=search', data);
         expect(info.status).toBe(200);
-        expect(info.canonical).toBe(`${SITE_URL}/collections/refrigeration/Cold%20Bain%20Marie`);
+        expect(info.canonical).toBe(`${SITE_URL}/collections/refrigeration/cold-bain-marie`);
         expect(info.image).toBe(`${SITE_URL}/images/refrigeration/cold-bain-marie.webp`);
         const product = schemaOf(info, 'Product');
         expect(product.name).toBe('Cold Bain Marie');
@@ -68,10 +69,13 @@ describe('public route metadata', () => {
         expect(schemaOf(info, 'BreadcrumbList').itemListElement.map((item) => item.position)).toEqual([1, 2, 3, 4]);
     });
 
-    it('preserves reserved characters in existing product URLs without double decoding', () => {
-        expect(productPath('refrigeration', "Chef's & Baker's Counter")).toBe("/collections/refrigeration/Chef's%20%26%20Baker's%20Counter");
-        expect(getPageInfo(productPath('refrigeration', '100% Cooler'), data).status).toBe(200);
-        expect(getPageInfo(productPath('refrigeration', '100% Cooler'), data).canonical).toContain('100%25%20Cooler');
+    it('resolves names with reserved characters without double decoding', () => {
+        const legacy = getPageInfo("/collections/refrigeration/Chef's%20%26%20Baker's%20Counter", data);
+        expect(legacy.status).toBe(200);
+        expect(legacy.canonical).toBe(`${SITE_URL}/collections/refrigeration/chef-s-baker-s-counter`);
+        const percent = getPageInfo('/collections/refrigeration/100%25%20Cooler', data);
+        expect(percent.status).toBe(200);
+        expect(percent.canonical).toBe(`${SITE_URL}/collections/refrigeration/100-cooler`);
     });
 
     it.each(['/unknown', '/collections/missing', '/collections/refrigeration/missing', '/blog/missing', '/collections/constructor', '/collections/refrigeration/%E0%A4%A'])('returns a noindex 404 for %s', (path) => {
@@ -112,15 +116,21 @@ describe('public route metadata', () => {
         expect(info.description.length).toBeLessThanOrEqual(160);
         expect(info.description).not.toContain('<p>');
         expect(info.image).toBe(`${SITE_URL}/images/ak-sales-logo.png`);
-        expect(getPageInfo(productPath('refrigeration', '100% Cooler'), data).image).toBe(`${SITE_URL}/images/ak-sales-logo.png`);
-        const remote = getPageInfo(productPath('refrigeration', "Chef's & Baker's Counter"), data);
+        expect(getPageInfo(productPath('refrigeration', { name: '100% Cooler' }), data).image).toBe(`${SITE_URL}/images/ak-sales-logo.png`);
+        const remote = getPageInfo(productPath('refrigeration', { name: "Chef's & Baker's Counter" }), data);
         expect(remote.image).toBe('https://res.cloudinary.com/example/image.webp');
     });
 
     it('resolves bundled catalogue and blog routes in Node without browser storage', () => {
         for (const [key, category] of Object.entries(productsData)) {
             expect(getPageInfo(`/collections/${key}`).status).toBe(200);
-            category.products.forEach((product) => expect(getPageInfo(productPath(key, product.name)).status).toBe(200));
+            category.products.forEach((product) => {
+                const info = getPageInfo(productPath(key, product));
+                expect(info.status).toBe(200);
+                expect(info.canonical).toBe(`${SITE_URL}${productPath(key, product)}`);
+                expect(schemaOf(info, 'Product').name).toBe(product.name);
+                expect(getPageInfo(`/collections/${key}/${encodeURIComponent(product.name)}`).canonical).toBe(info.canonical);
+            });
         }
         blogsData.forEach((blog) => expect(getPageInfo(`/blog/${blog.slug}`).status).toBe(200));
     });
@@ -236,6 +246,141 @@ describe('rich blog metadata', () => {
     });
 });
 
+describe('slug product URLs and rich catalogue metadata', () => {
+    const doc = (text) => ({ type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text }] }] });
+    const tandoor = {
+        name: 'Tank Tandoor', slug: 'clay-tank-tandoor', oldSlugs: ['tandoor-old', 'drum-tandoor-2'],
+        image: 'https://res.cloudinary.com/demo/image/upload/v1/tandoor.jpg', imageAlt: 'Steel tank tandoor with clay pot',
+        gallery: [
+            { src: 'https://res.cloudinary.com/demo/image/upload/v1/tandoor-side.jpg', alt: 'Side view' },
+            { src: 'javascript:alert(1)', alt: 'Unsafe' },
+            { src: '/images/heating-range/tank-tandoor.webp', alt: 'Front view' },
+        ],
+        summary: 'A charcoal tank tandoor with a clay pot for hotel kitchens.', body: doc('Built from stainless steel.'),
+        specs: [{ label: 'Material', value: 'SS 304' }, { label: 'Fuel', value: 'Charcoal' }, { label: 'Empty', value: ' ' }],
+        faqs: [{ question: 'Does it use gas?', answer: 'No, it burns <b>charcoal</b> only' }, { question: 'Incomplete', answer: '' }],
+        modelNumber: 'AK-TT-36', updatedAt: '2026-10-20T08:00:00.000Z',
+    };
+    const catalogue = {
+        'heating-range': {
+            title: 'Heating Range', description: 'Burners and tandoors.', updatedAt: new Date('2026-10-21T10:00:00.000Z'),
+            seoTitle: 'Commercial Heating Equipment in Surat', metaDescription: 'Gas ranges and tandoors built in Surat.',
+            faqs: [{ question: 'Do you build custom burners?', answer: 'Yes, to your kitchen layout.' }],
+            products: [tandoor, { name: 'Dosa Bhatti', image: '/images/heating-range/dosa-bhatti.webp' }],
+        },
+        bakery: { title: 'Bakery', products: [{ name: 'Bread Oven', image: '/images/bakery-product/bread-oven.webp', oldSlugs: ['oven'] }] },
+    };
+    const site = { products: catalogue, blogs };
+    const get = (path) => getPageInfo(path, site);
+    const canonical = `${SITE_URL}/collections/heating-range/clay-tank-tandoor`;
+
+    it('serves the custom slug as the canonical product URL', () => {
+        const info = get('/collections/heating-range/clay-tank-tandoor');
+        expect(info.status).toBe(200);
+        expect(info.canonical).toBe(canonical);
+        expect(productPath('heating-range', tandoor)).toBe('/collections/heating-range/clay-tank-tandoor');
+    });
+
+    it('resolves a legacy name URL with a slug canonical, which the server turns into a 301', () => {
+        const info = get('/collections/heating-range/Tank%20Tandoor');
+        expect(info.status).toBe(200);
+        expect(info.canonical).toBe(canonical);
+        expect(get('/collections/heating-range/Dosa%20Bhatti').canonical).toBe(`${SITE_URL}/collections/heating-range/dosa-bhatti`);
+    });
+
+    it('sends old slugs, other casing and a previous category to the current canonical', () => {
+        expect(get('/collections/heating-range/tandoor-old').canonical).toBe(canonical);
+        expect(get('/collections/heating-range/Clay-Tank-Tandoor').canonical).toBe(canonical);
+        const moved = get('/collections/bakery/clay-tank-tandoor');
+        expect(moved.status).toBe(200);
+        expect(moved.canonical).toBe(canonical);
+        expect(schemaOf(moved, 'BreadcrumbList').itemListElement[2].item).toBe(`${SITE_URL}/collections/heating-range`);
+        expect(get('/collections/heating-range/oven').canonical).toBe(`${SITE_URL}/collections/bakery/bread-oven`);
+        expect(get('/collections/deleted-category/drum-tandoor-2').canonical).toBe(canonical);
+    });
+
+    it.each(['/collections/heating-range/unknown', '/collections/bakery/Tank%20Tandoor', '/collections/heating-range/clay-tank-tandoor/extra'])('returns a noindex 404 for %s', (path) => {
+        const info = get(path);
+        expect(info.status).toBe(404);
+        expect(info.noindex).toBe(true);
+    });
+
+    it('uses the custom SEO title and meta description, else the summary, and the image alt', () => {
+        const info = get('/collections/heating-range/clay-tank-tandoor');
+        expect(info.title).toBe('Tank Tandoor in Surat | AK Sales');
+        expect(info.description).toBe(tandoor.summary);
+        expect(info.imageAlt).toBe('Steel tank tandoor with clay pot');
+        const edited = { ...tandoor, seoTitle: 'Tank Tandoor Manufacturer, Surat', metaDescription: 'Charcoal tandoors made to order.' };
+        const custom = getPageInfo('/collections/heating-range/clay-tank-tandoor', { products: { 'heating-range': { ...catalogue['heating-range'], products: [edited] } }, blogs });
+        expect(custom.title).toBe('Tank Tandoor Manufacturer, Surat');
+        expect(custom.description).toBe('Charcoal tandoors made to order.');
+    });
+
+    it('falls back to the template description and the product name as alt for legacy products', () => {
+        const info = get('/collections/heating-range/dosa-bhatti');
+        expect(info.title).toBe('Dosa Bhatti in Surat | AK Sales');
+        expect(info.description).toBe('Dosa Bhatti from AK Sales in Surat. Explore our heating range catalogue and contact us for commercial kitchen specifications and a quote.');
+        expect(info.imageAlt).toBe('Dosa Bhatti');
+    });
+
+    it('describes the product with brand, images, sku and specifications but no offers', () => {
+        const product = schemaOf(get('/collections/heating-range/clay-tank-tandoor'), 'Product');
+        expect(product.brand).toEqual({ '@type': 'Brand', name: 'AK Sales' });
+        expect(product.manufacturer).toEqual({ '@id': `${SITE_URL}/#business` });
+        expect(product.image).toEqual([tandoor.image, tandoor.gallery[0].src, `${SITE_URL}/images/heating-range/tank-tandoor.webp`]);
+        expect(product.sku).toBe('AK-TT-36');
+        expect(product.description).toBe(tandoor.summary);
+        expect(product.category).toBe('Heating Range');
+        expect(product.additionalProperty).toEqual([
+            { '@type': 'PropertyValue', name: 'Material', value: 'SS 304' },
+            { '@type': 'PropertyValue', name: 'Fuel', value: 'Charcoal' },
+        ]);
+        expect(product).not.toHaveProperty('offers');
+        expect(product).not.toHaveProperty('aggregateRating');
+        const legacy = schemaOf(get('/collections/heating-range/dosa-bhatti'), 'Product');
+        expect(legacy.image).toEqual([`${SITE_URL}/images/heating-range/dosa-bhatti.webp`]);
+        expect(legacy).not.toHaveProperty('sku');
+        expect(legacy).not.toHaveProperty('additionalProperty');
+    });
+
+    it('adds a plain-text FAQPage for products and categories that have complete FAQs', () => {
+        const productFaq = schemaOf(get('/collections/heating-range/clay-tank-tandoor'), 'FAQPage');
+        expect(productFaq['@id']).toBe(`${canonical}#faq`);
+        expect(productFaq.mainEntity).toEqual([{ '@type': 'Question', name: 'Does it use gas?', acceptedAnswer: { '@type': 'Answer', text: 'No, it burns charcoal only' } }]);
+        const categoryFaq = schemaOf(get('/collections/heating-range'), 'FAQPage');
+        expect(categoryFaq['@id']).toBe(`${SITE_URL}/collections/heating-range#faq`);
+        expect(categoryFaq.mainEntity).toHaveLength(1);
+        expect(schemaOf(get('/collections/heating-range/dosa-bhatti'), 'FAQPage')).toBeUndefined();
+        expect(schemaOf(get('/collections/bakery'), 'FAQPage')).toBeUndefined();
+    });
+
+    it('uses the custom category title and description, falling back to the existing ones', () => {
+        const custom = get('/collections/heating-range');
+        expect(custom.title).toBe('Commercial Heating Equipment in Surat');
+        expect(custom.description).toBe('Gas ranges and tandoors built in Surat.');
+        const plain = get('/collections/bakery');
+        expect(plain.title).toBe('Bakery Equipment | AK Sales Surat');
+        expect(plain.description).toContain('Explore bakery equipment from AK Sales in Surat.');
+    });
+
+    it('lists slug URLs in the sitemap with lastmod only where updatedAt exists', () => {
+        const xml = sitemapXml(site);
+        expect(xml).toContain(`<url><loc>${SITE_URL}/collections/heating-range</loc><lastmod>2026-10-21</lastmod></url>`);
+        expect(xml).toContain(`<url><loc>${canonical}</loc><lastmod>2026-10-20</lastmod></url>`);
+        expect(xml).toContain(`<url><loc>${SITE_URL}/collections/heating-range/dosa-bhatti</loc></url>`);
+        expect(xml).toContain(`<url><loc>${SITE_URL}/collections/bakery</loc></url>`);
+        expect(xml).not.toContain('%20');
+        expect(xml).not.toContain('tandoor-old');
+        expect(xml.match(/<lastmod>/g)).toHaveLength(2);
+    });
+
+    it('lists only bundled catalogue URLs that resolve to themselves', () => {
+        const paths = [...sitemapXml({ products: productsData, blogs: [] }).matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => new URL(match[1]).pathname);
+        expect(paths.length).toBeGreaterThan(60);
+        paths.forEach((path) => expect(getPageInfo(path).canonical).toBe(`${SITE_URL}${path}`));
+    });
+});
+
 describe('crawler documents', () => {
     it('includes public populated routes exactly once and excludes empty or private routes', () => {
         const xml = sitemapXml(data);
@@ -253,14 +398,15 @@ describe('crawler documents', () => {
     });
 
     it('escapes XML-sensitive URL characters and ignores incomplete catalogue entries', () => {
-        const xml = sitemapXml({ products: { ...products, invalid: { title: '', products: [{ name: 'Invisible' }] } }, blogs: [...blogs, { slug: '', title: 'Missing slug' }, { slug: 'missing-title' }] });
-        expect(xml).toContain('Chef&apos;s%20%26%20Baker&apos;s%20Counter');
+        const xml = sitemapXml({ products: { ...products, "chef's": { title: "Chef's Range", products: [{ name: 'Tandoor' }] }, invalid: { title: '', products: [{ name: 'Invisible' }] } }, blogs: [...blogs, { slug: '', title: 'Missing slug' }, { slug: 'missing-title' }] });
+        expect(xml).toContain(`<loc>${SITE_URL}/collections/chef&apos;s/tandoor</loc>`);
+        expect(xml).toContain(`<loc>${SITE_URL}/collections/refrigeration/chef-s-baker-s-counter</loc>`);
         expect(xml).not.toContain('Invisible');
         expect(xml).not.toContain('missing-title');
     });
 
     it('excludes dot segments that cannot represent usable catalogue routes', () => {
-        const xml = sitemapXml({ products: { '..': products.refrigeration, test: { title: 'Test', products: [{ name: '.' }, { name: '..' }] } }, blogs: [{ slug: '.', title: 'Invalid route' }] });
+        const xml = sitemapXml({ products: { '..': products.refrigeration, '.': products.refrigeration, test: { title: 'Test', products: [{ name: ' ' }, { image: '/x.webp' }] } }, blogs: [{ slug: '.', title: 'Invalid route' }] });
         expect(xml).not.toContain('/collections/');
         expect(xml).not.toContain('/blog/');
     });

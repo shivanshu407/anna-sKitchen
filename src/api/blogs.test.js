@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { addBlog, updateBlog, uploadBlogImage, fetchAllBlogsAdmin, blogFormData } from './blogs';
+import { addBlog, updateBlog, uploadBlogImage, fetchAllBlogsAdmin, blogFormData, importBundledBlogs } from './blogs';
 
 afterEach(() => {
     vi.unstubAllGlobals();
@@ -101,6 +101,25 @@ describe('blog write calls', () => {
         expect(url).toBe('/api/blogs/images');
         expect(options.body.get('alt')).toBe('Six-burner range');
         expect(options.body.get('image')).toBeInstanceOf(File);
+    });
+});
+
+describe('importBundledBlogs', () => {
+    it('posts to the import route with the session cookie', async () => {
+        const spy = vi.fn().mockResolvedValue(jsonResponse(201, { message: 'Imported 4 posts', imported: ['a', 'b'] }));
+        vi.stubGlobal('fetch', spy);
+
+        await expect(importBundledBlogs()).resolves.toEqual({ message: 'Imported 4 posts', imported: ['a', 'b'] });
+        const [url, options] = spy.mock.calls[0];
+        expect(url).toBe('/api/blogs/import-bundled');
+        expect(options.method).toBe('POST');
+        expect(options.credentials).toBe('same-origin');
+    });
+
+    it('throws the server message when the import fails', async () => {
+        vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(401, { error: 'Authentication required' })));
+
+        await expect(importBundledBlogs()).rejects.toThrow('Authentication required');
     });
 });
 

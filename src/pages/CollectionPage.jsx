@@ -1,7 +1,13 @@
+import React from 'react';
 import Image from '../components/Image';
+import BlogContent from '../components/BlogContent';
 import { useParams, Link } from 'react-router-dom';
 import { FaHome, FaChevronRight, FaPhone, FaArrowLeft, FaArrowRight, FaWhatsapp } from 'react-icons/fa';
 import { useSiteData } from '../lib/site-data';
+import { productPath } from '../lib/catalogue';
+
+const hasBody = (body) => body?.type === 'doc' && Array.isArray(body.content) && body.content.length > 0;
+const completeFaqs = (faqs) => (Array.isArray(faqs) ? faqs : []).filter((faq) => faq?.question?.trim() && faq?.answer?.trim());
 
 const CollectionPage = () => {
     const { category } = useParams();
@@ -40,6 +46,8 @@ const CollectionPage = () => {
             </div>
         );
     }
+
+    const faqs = completeFaqs(data.faqs);
 
     return (
         <div className="min-h-screen bg-secondary">
@@ -127,7 +135,7 @@ const CollectionPage = () => {
                         {data.products.map((product, index) => (
                             <Link
                                 key={index}
-                                to={`/collections/${category}/${encodeURIComponent(product.name)}`}
+                                to={productPath(category, product)}
                                 className="group relative rounded-2xl overflow-hidden transition-all duration-700 hover:-translate-y-2 block"
                             >
                                 {/* Card border / frame */}
@@ -142,7 +150,7 @@ const CollectionPage = () => {
                                             loading="lazy"
                                             decoding="async"
                                             src={product.image}
-                                            alt={product.name}
+                                            alt={product.imageAlt || product.name}
                                             className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 drop-shadow-2xl"
                                         />
                                         {/* Subtle glow behind product */}
@@ -159,6 +167,9 @@ const CollectionPage = () => {
                                         <h3 className="font-bold text-secondary text-sm md:text-base font-heading tracking-wide group-hover:text-primary transition-colors duration-500">
                                             {product.name}
                                         </h3>
+                                        {product.summary && (
+                                            <p className="text-gray-500 text-xs md:text-sm leading-relaxed mt-2 line-clamp-2">{product.summary}</p>
+                                        )}
                                         <div className="flex items-center justify-between mt-4">
                                             <span className="text-secondary/70 text-xs font-semibold uppercase tracking-wider group-hover:text-primary transition-colors">
                                                 View Details
@@ -174,6 +185,30 @@ const CollectionPage = () => {
                     </div>
                 )}
             </div>
+
+            {/* Buying guide and FAQs */}
+            {(hasBody(data.body) || faqs.length > 0) && (
+                <div className="max-w-4xl mx-auto px-4 pb-16 space-y-12">
+                    {hasBody(data.body) && (
+                        <div className="bg-gold-light rounded-2xl shadow-sm p-6 md:p-10 [&>div>:first-child]:mt-0">
+                            <BlogContent body={data.body} />
+                        </div>
+                    )}
+                    {faqs.length > 0 && (
+                        <section>
+                            <h2 className="text-2xl md:text-3xl font-bold text-white font-heading mb-6">Frequently asked questions</h2>
+                            <div className="space-y-4">
+                                {faqs.map((faq, index) => (
+                                    <div key={index} className="bg-white/5 border border-white/10 rounded-2xl p-5">
+                                        <h3 className="text-base md:text-lg font-bold text-white font-heading mb-2">{faq.question}</h3>
+                                        <p className="text-white/60 leading-relaxed">{faq.answer}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+                </div>
+            )}
 
             {/* Contact Bar */}
             <div className="border-t border-white/5">

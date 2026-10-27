@@ -1,54 +1,17 @@
-const crypto = require('crypto');
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const { v2: cloudinary } = require('cloudinary');
 const Blog = require('../models/Blog');
 const { requireAuth } = require('../auth');
 const { sanitizePost, validateDraft, validateForPublish, displayDate } = require('../blog-input');
-
-// Configure Cloudinary (it uses the same credentials initialized in products route, but we'll re-ensure config)
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-});
-
-const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
-const upload = multer({
-    storage: multer.memoryStorage(),
-    limits: { fileSize: 5 * 1024 * 1024, files: 1, fields: 40, fieldSize: 400 * 1024 },
-    fileFilter(req, file, cb) {
-        if (IMAGE_TYPES.includes(file.mimetype)) return cb(null, true);
-        const err = new Error('Images must be JPEG, PNG, WebP or AVIF files.');
-        err.status = 400;
-        cb(err);
-    }
-});
-
-// Multer errors are the client's fault (too big, wrong type), so answer 400.
-const singleImage = (field) => (req, res, next) => upload.single(field)(req, res, (err) => {
-    if (!err) return next();
-    const error = err.code === 'LIMIT_FILE_SIZE' ? 'Images must be 5 MB or smaller.' : err.message;
-    res.status(err instanceof multer.MulterError || err.status === 400 ? 400 : 500).json({ error });
-});
+const { singleImage, uploadImage } = require('../uploads');
+const { loadFallbackData } = require('../web');
 
 const PUBLISHED = { status: { $ne: 'draft' } };
-const slugify = (value) => String(value).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '').slice(0, 60);
-
-// Descriptive file names help image search, so the Cloudinary id comes from the alt text.
-async function uploadImage(file, name) {
-    const dataURI = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
-    const result = await cloudinary.uploader.upload(dataURI, {
-        folder: 'annas-kitchen/blogs',
-        public_id: `${slugify(name) || 'blog-image'}-${crypto.randomBytes(3).toString('hex')}`
-    });
-    return { url: result.secure_url, width: result.width, height: result.height };
-}
+const FOLDER = 'annas-kitchen/blogs';
 
 async function attachFeaturedImage(post, file) {
     if (!file) return;
-    const { url, width, height } = await uploadImage(file, post.imageAlt || post.title);
+    const { url, width, height } = await uploadImage(file, post.imageAlt || post.title, FOLDER);
     Object.assign(post, { image: url, imageWidth: width, imageHeight: height });
 }
 
@@ -93,10 +56,39 @@ router.post('/images', requireAuth, singleImage('image'), async (req, res) => {
         const alt = typeof req.body.alt === 'string' ? req.body.alt.trim() : '';
         if (!req.file) return res.status(400).json({ error: 'Choose an image to upload.' });
         if (!alt) return res.status(400).json({ error: 'Describe the image in its alt text.' });
-        res.status(201).json(await uploadImage(req.file, alt));
+        res.status(201).json(await uploadImage(req.file, alt, FOLDER));
     } catch (err) {
         console.error('Error uploading blog image:', err);
         res.status(500).json({ error: 'Failed to upload image', details: err.message });
+    }
+});
+
+// POST /api/blogs/import-bundled - Copy the built-in posts into MongoDB. Once the
+// database holds any post the site shows only database posts, so every missing
+// one is imported in a single step.
+router.post('/import-bundled', requireAuth, async (req, res) => {
+    try {
+        const bundled = (await loadFallbackData()).blogs || [];
+        const existing = await Blog.find({ slug: { $in: bundled.map((post) => post.slug) } }, 'slug');
+        const have = new Set(existing.map((post) => post.slug));
+        const missing = bundled.filter((post) => !have.has(post.slug)).map((post) => ({
+            ...post,
+            status: 'published',
+            imageAlt: post.imageAlt || post.title,
+            publishedAt: legacyPublishedAt(post.date),
+        }));
+        if (missing.length) await Blog.insertMany(missing);
+        const imported = missing.map((post) => post.slug);
+        res.status(imported.length ? 201 : 200).json({
+            message: imported.length ? `Imported ${imported.length} built-in post(s)` : 'Every built-in post is already in the database',
+            imported,
+        });
+    } catch (err) {
+        console.error('Error importing bundled blogs:', err);
+        if (err.code === 11000) {
+            return res.status(400).json({ error: 'A blog with one of these URL slugs already exists.' });
+        }
+        res.status(500).json({ error: 'Failed to import blogs', details: err.message });
     }
 });
 

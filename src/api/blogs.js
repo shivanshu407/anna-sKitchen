@@ -118,6 +118,17 @@ export const uploadBlogImage = (file, alt) => {
 };
 
 /**
+ * Copy every bundled post that is not in the database yet into it, so all of
+ * them become editable. Resolves to { message, imported: [slugs] }.
+ */
+export const importBundledBlogs = async () => {
+    const res = await fetch(`${API_BASE}/blogs/import-bundled`, { method: 'POST', credentials: 'same-origin' });
+    if (!res.ok) throw await responseError(res, 'Failed to import the built-in posts');
+    const contentType = res.headers.get('content-type');
+    return contentType && contentType.includes('application/json') ? res.json() : { imported: [] };
+};
+
+/**
  * Delete a blog via the API
  */
 export const deleteBlog = async (slug) => {

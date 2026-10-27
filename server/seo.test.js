@@ -1,5 +1,6 @@
 import { beforeAll, afterAll, describe, it, expect } from 'vitest';
 import { getPageInfo } from '../src/lib/seo.js';
+import { productPath } from '../src/lib/catalogue.js';
 import { fallbackData } from '../src/lib/site-data.js';
 
 let server, base;
@@ -12,8 +13,8 @@ beforeAll(async () => {
 afterAll(async () => { if (server) await new Promise(resolve => server.close(resolve)); });
 
 describe('crawlable production HTML', () => {
-    it.each(['/', '/about', '/services', '/projects', '/contact', '/collections', '/blogs', '/collections/heating-range', '/collections/heating-range/Dosa%20Bhatti', '/blog/commercial-dishwasher-buying-guide-2025'])('serves complete metadata and visible content before JavaScript at %s', async path => {
-        const response = await fetch(base + path);
+    it.each(['/', '/about', '/services', '/projects', '/contact', '/collections', '/blogs', '/collections/heating-range', '/collections/heating-range/dosa-bhatti', '/blog/commercial-dishwasher-buying-guide-2025'])('serves complete metadata and visible content before JavaScript at %s', async path => {
+        const response = await fetch(base + path, { redirect: 'manual' });
         const html = await response.text();
         const head = html.split('</head>')[0];
         const page = getPageInfo(path);
@@ -32,7 +33,7 @@ describe('crawlable production HTML', () => {
         expect(schema['@graph'].some(node => node['@type'] === 'LocalBusiness')).toBe(true);
     });
     it('renders product and blog text with crawlable internal links', async () => {
-        const product = await (await fetch(base + '/collections/heating-range/Dosa%20Bhatti')).text();
+        const product = await (await fetch(base + '/collections/heating-range/dosa-bhatti')).text();
         expect(product).toContain('Dosa');
         expect(product).toContain('Bhatti');
         expect(product).toContain('href="/collections/heating-range"');
@@ -58,8 +59,15 @@ describe('crawlable production HTML', () => {
         expect(response.headers.get('x-robots-tag')).toContain('noindex');
         expect(await response.text()).toMatch(/name="robots" content="noindex, follow"/);
     });
-    it('permanently normalizes trailing slashes and product-name casing while keeping queries', async () => {
-        for (const [source, target] of [['/about/?utm_source=test', '/about?utm_source=test'], ['/collections/heating-range/dosa%20bhatti', '/collections/heating-range/Dosa%20Bhatti'], ['/index.html', '/']]) {
+    it('permanently redirects trailing slashes, legacy product-name URLs and slug casing to the canonical while keeping queries', async () => {
+        for (const [source, target] of [
+            ['/about/?utm_source=test', '/about?utm_source=test'],
+            ['/collections/heating-range/Dosa%20Bhatti', '/collections/heating-range/dosa-bhatti'],
+            ['/collections/heating-range/dosa%20bhatti?ref=old', '/collections/heating-range/dosa-bhatti?ref=old'],
+            ['/collections/heating-range/Dosa-Bhatti', '/collections/heating-range/dosa-bhatti'],
+            ['/collections/heating-range/dosa-bhatti/', '/collections/heating-range/dosa-bhatti'],
+            ['/index.html', '/'],
+        ]) {
             const response = await fetch(base + source, { redirect: 'manual' });
             expect(response.status).toBe(301);
             expect(response.headers.get('location')).toBe(target);
@@ -84,11 +92,14 @@ describe('crawlable production HTML', () => {
         const urls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(match => match[1].replaceAll('&amp;', '&'));
         expect(new Set(urls).size).toBe(urls.length);
         expect(urls.length).toBeGreaterThan(70);
+        expect(urls).toContain('https://aksales.in/collections/heating-range/dosa-bhatti');
+        expect(urls.some(url => url.includes('%20'))).toBe(false);
         for (const url of urls) {
             const page = getPageInfo(new URL(url).pathname);
             expect(page.status, url).toBe(200);
             expect(page.noindex, url).toBe(false);
-            const route = await fetch(base + new URL(url).pathname);
+            expect(page.canonical, url).toBe(url);
+            const route = await fetch(base + new URL(url).pathname, { redirect: 'manual' });
             expect(route.status, url).toBe(200);
         }
     });
@@ -96,10 +107,12 @@ describe('crawlable production HTML', () => {
         const { render, serializeJson } = await import('../dist-server/entry-server.js');
         const name = '100% </script><script>alert(1)</script>';
         const data = { ...fallbackData, products: { custom: { title: 'Custom', slug: 'custom', description: 'Equipment', products: [{ name, image: '/images/ab.webp' }] } } };
-        const { body, head } = render(`/collections/custom/${encodeURIComponent(name)}`, data);
-        expect(body).toContain('100%');
-        expect(body).not.toContain('<script>alert(1)</script>');
-        expect(head).not.toContain('<script>alert(1)</script>');
+        for (const path of [`/collections/custom/${encodeURIComponent(name)}`, productPath('custom', { name })]) {
+            const { body, head } = render(path, data);
+            expect(body, path).toContain('100%');
+            expect(body, path).not.toContain('<script>alert(1)</script>');
+            expect(head, path).not.toContain('<script>alert(1)</script>');
+        }
         expect(serializeJson(data)).not.toContain('</script>');
         expect(JSON.parse(serializeJson(data))).toEqual(data);
     });

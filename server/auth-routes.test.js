@@ -33,8 +33,12 @@ afterAll(async () => {
 
 const MUTATIONS = [
     ['POST', '/api/products'],
-    ['DELETE', '/api/products/heating-range/0'],
+    ['PUT', '/api/products/heating-range/dosa-bhatti'],
+    ['DELETE', '/api/products/heating-range/dosa-bhatti'],
+    ['PUT', '/api/products/categories/heating-range'],
+    ['POST', '/api/products/images'],
     ['POST', '/api/blogs'],
+    ['POST', '/api/blogs/import-bundled'],
     ['PUT', '/api/blogs/some-slug'],
     ['POST', '/api/blogs/images'],
     ['DELETE', '/api/blogs/some-slug'],
@@ -131,7 +135,7 @@ describe('login', () => {
         const login = await postLogin({ username: USERNAME, password: PASSWORD });
         const cookie = login.headers.get('set-cookie').split(';')[0];
 
-        const res = await fetch(`${base}/api/products/heating-range/0`, {
+        const res = await fetch(`${base}/api/products/heating-range/dosa-bhatti`, {
             method: 'DELETE',
             headers: { Cookie: cookie },
         });

@@ -133,6 +133,13 @@ function parseJson(value, fallback) {
     try { return JSON.parse(value); } catch { return undefined; }
 }
 
+function sanitizeFaqs(faqs) {
+    return (Array.isArray(faqs) ? faqs : [])
+        .map((faq) => ({ question: text(faq?.question, 300), answer: text(faq?.answer, 2000) }))
+        .filter((faq) => faq.question && faq.answer)
+        .slice(0, 20);
+}
+
 function sanitizePost(raw = {}) {
     const tags = parseJson(raw.tags, []);
     const faqs = parseJson(raw.faqs, []);
@@ -155,10 +162,7 @@ function sanitizePost(raw = {}) {
         authorBio: text(raw.authorBio, 500),
         authorUrl: safeUrl(raw.authorUrl, ['http:', 'https:']) || '',
         tags: (Array.isArray(tags) ? tags : []).map((tag) => text(tag, 40)).filter(Boolean).slice(0, 10),
-        faqs: (Array.isArray(faqs) ? faqs : [])
-            .map((faq) => ({ question: text(faq?.question, 300), answer: text(faq?.answer, 2000) }))
-            .filter((faq) => faq.question && faq.answer)
-            .slice(0, 20),
+        faqs: sanitizeFaqs(faqs),
         body,
     };
     if (publishedAt && !Number.isNaN(publishedAt.getTime())) post.publishedAt = publishedAt;
@@ -189,4 +193,8 @@ function displayDate(date) {
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Kolkata' });
 }
 
-module.exports = { sanitizeBody, sanitizePost, validateDraft, validateForPublish, displayDate, SLUG };
+module.exports = {
+    sanitizeBody, sanitizePost, validateDraft, validateForPublish, displayDate, SLUG,
+    // Shared with catalogue-input.js.
+    text, int, imageSrc, parseJson, sanitizeFaqs, walk,
+};

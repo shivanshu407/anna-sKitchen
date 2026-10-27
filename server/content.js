@@ -21,12 +21,24 @@ function createContentLoader({ fallback, isConnected, read, now = Date.now, ttl 
 }
 
 module.exports = { createContentLoader, toCatalogue };
+const CATEGORY_FIELDS = ['title', 'slug', 'description', 'seoTitle', 'metaDescription', 'body', 'faqs', 'updatedAt'];
+const PRODUCT_FIELDS = ['name', 'slug', 'oldSlugs', 'image', 'imageAlt', 'imageWidth', 'imageHeight', 'gallery', 'summary',
+    'body', 'specs', 'faqs', 'seoTitle', 'metaDescription', 'focusKeyword', 'modelNumber', 'updatedAt'];
+
+// Only listed fields, never _id; undefined ones are left out so legacy items stay { name, image }.
+function pick(source, fields) {
+    const out = {};
+    for (const field of fields) if (source[field] !== undefined) out[field] = source[field];
+    return out;
+}
+
 function toCatalogue(categories) {
-    return Object.fromEntries(categories.map(category => [category.slug, {
-        title: category.title,
-        slug: category.slug,
-        description: category.description,
-        products: category.products.map(({ name, image }) => ({ name, image })),
-    }]));
+    return Object.fromEntries(categories.map((doc) => {
+        const category = typeof doc.toObject === 'function' ? doc.toObject() : doc;
+        return [category.slug, {
+            ...pick(category, CATEGORY_FIELDS),
+            products: (category.products || []).map((product) => pick(product, PRODUCT_FIELDS)),
+        }];
+    }));
 }
 

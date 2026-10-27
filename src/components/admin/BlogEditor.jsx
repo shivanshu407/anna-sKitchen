@@ -1,27 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FaPlus, FaTrash, FaEye, FaTimes } from 'react-icons/fa';
+import { FaEye, FaTimes } from 'react-icons/fa';
 import RichTextEditor from './RichTextEditor';
 import SeoPanel from './SeoPanel';
+import {
+    inputClass, fileInputClass, labelClass, hintClass, primaryButton, ghostButton,
+    Counter, FieldLabel, Section, FaqFields, ErrorList,
+} from './FormParts';
+import { IMAGE_TYPES, EMPTY_DOC, imageFileError, completeFaqs } from './form-helpers';
 import BlogArticle from '../BlogArticle';
 import { addBlog, updateBlog, uploadBlogImage } from '../../api/blogs';
-import { bodyOf, blogSeoTitle, slugify, wordCount } from '../../lib/blog-content';
+import { bodyOf, blogDescription, blogSeoTitle, slugify, wordCount } from '../../lib/blog-content';
 import { analyzePost, LIMITS, SLUG } from '../../lib/blog-seo-check';
 
 const SITE = 'https://aksales.in';
 const TIME_ZONE = 'Asia/Kolkata';
 const MAX_SLUG = 80;
-const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
-const EMPTY_DOC = { type: 'doc', content: [{ type: 'paragraph' }] };
-
-const inputClass = 'w-full px-4 py-3 border border-white/10 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent bg-secondary/40 text-white placeholder-gray-500 transition-all font-medium';
-const labelClass = 'block text-sm font-medium text-gray-300 mb-2';
-const hintClass = 'text-xs text-gray-400 mt-2';
-const cardClass = 'bg-secondary/20 border border-white/5 rounded-2xl p-6 space-y-6';
-const buttonBase = 'inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-bold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed';
-const primaryButton = `${buttonBase} bg-accent text-secondary hover:bg-white shadow-lg`;
-const ghostButton = `${buttonBase} border border-white/15 text-gray-200 hover:bg-white/10`;
-const smallGhostButton = 'inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold border border-white/15 text-gray-200 hover:bg-white/10 transition-colors';
 
 const autoSlug = (title) => slugify(title).slice(0, MAX_SLUG).replace(/-+$/, '');
 const dayOf = (date) => date.toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: TIME_ZONE });
@@ -59,30 +52,6 @@ function initialForm(blog) {
         dayTouched: false,
     };
 }
-
-const Counter = ({ value, range, max, unit = '' }) => {
-    const [min, upper] = range || [0, max];
-    const out = value > upper || (range && value > 0 && value < min);
-    return (
-        <span className={`text-xs font-medium tabular-nums ${out ? 'text-amber-300' : 'text-gray-400'}`}>
-            {value}{unit}{range ? ` (aim ${min}–${upper})` : ` / ${upper}`}
-        </span>
-    );
-};
-
-const FieldLabel = ({ htmlFor, children, counter }) => (
-    <div className="flex items-end justify-between gap-4 mb-2">
-        <label htmlFor={htmlFor} className="text-sm font-medium text-gray-300">{children}</label>
-        {counter}
-    </div>
-);
-
-const Section = ({ title, children }) => (
-    <section className={cardClass}>
-        <h3 className="text-lg font-bold text-white border-b border-white/10 pb-3">{title}</h3>
-        {children}
-    </section>
-);
 
 const PreviewModal = ({ blog, onClose }) => {
     useEffect(() => {
@@ -153,16 +122,13 @@ const BlogEditor = ({ blog, categories = [], onSaved, onCancel }) => {
 
     const setBody = (body) => setForm((prev) => ({ ...prev, body }));
 
-    const setFaq = (index, field, value) => setForm((prev) => ({
-        ...prev,
-        faqs: prev.faqs.map((faq, i) => (i === index ? { ...faq, [field]: value } : faq)),
-    }));
+    const setFaqs = (list) => setForm((prev) => ({ ...prev, faqs: list }));
 
     const chooseImage = (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        if (!IMAGE_TYPES.includes(file.type)) { setImageError('Images must be JPEG, PNG, WebP or AVIF files.'); e.target.value = ''; return; }
-        if (file.size > MAX_IMAGE_BYTES) { setImageError('Images must be 5 MB or smaller.'); e.target.value = ''; return; }
+        const problem = imageFileError(file);
+        if (problem) { setImageError(problem); e.target.value = ''; return; }
         if (imagePreviewRef.current) URL.revokeObjectURL(imagePreviewRef.current);
         imagePreviewRef.current = URL.createObjectURL(file);
         setImageError('');
@@ -171,9 +137,7 @@ const BlogEditor = ({ blog, categories = [], onSaved, onCancel }) => {
     };
 
     const tags = useMemo(() => [...new Set(form.tags.split(',').map((tag) => tag.trim()).filter(Boolean))], [form.tags]);
-    const faqs = useMemo(() => form.faqs
-        .map((faq) => ({ question: faq.question.trim(), answer: faq.answer.trim() }))
-        .filter((faq) => faq.question && faq.answer), [form.faqs]);
+    const faqs = useMemo(() => completeFaqs(form.faqs), [form.faqs]);
     const image = imagePreview || blog?.image || '';
 
     const post = useMemo(() => ({
@@ -309,29 +273,13 @@ const BlogEditor = ({ blog, categories = [], onSaved, onCancel }) => {
                             <p className={hintClass}>The title is the page's only H1, so start sections with H2 and use H3/H4 inside them. Question-style headings work well.</p>
                         </div>
 
-                        <div>
-                            <div className="flex items-center justify-between gap-4 mb-3">
-                                <p className="text-sm font-medium text-gray-300">FAQs</p>
-                                <button type="button" onClick={() => setForm((prev) => ({ ...prev, faqs: [...prev.faqs, { question: '', answer: '' }] }))} className={smallGhostButton}>
-                                    <FaPlus aria-hidden="true" /> Add question
-                                </button>
-                            </div>
-                            {form.faqs.length === 0 && <p className="text-sm text-gray-500 italic">No FAQs yet. Short questions with direct answers help AI search tools quote the post.</p>}
-                            <div className="space-y-4">
-                                {form.faqs.map((faq, index) => (
-                                    <div key={index} className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
-                                        <div className="flex items-center justify-between gap-4">
-                                            <span className="text-xs font-bold uppercase tracking-wider text-accent">Question {index + 1}</span>
-                                            <button type="button" onClick={() => setForm((prev) => ({ ...prev, faqs: prev.faqs.filter((_, i) => i !== index) }))} aria-label={`Remove question ${index + 1}`} title="Remove question" className="text-gray-400 hover:text-red-300 p-1">
-                                                <FaTrash className="text-xs" aria-hidden="true" />
-                                            </button>
-                                        </div>
-                                        <input type="text" aria-label={`Question ${index + 1}`} value={faq.question} maxLength={300} onChange={(e) => setFaq(index, 'question', e.target.value)} className={inputClass} placeholder="e.g. How much gas does a commercial fryer use?" />
-                                        <textarea aria-label={`Answer ${index + 1}`} rows={3} value={faq.answer} maxLength={2000} onChange={(e) => setFaq(index, 'answer', e.target.value)} className={`${inputClass} resize-y`} placeholder="A direct answer in two or three sentences." />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <FaqFields
+                            faqs={form.faqs}
+                            onChange={setFaqs}
+                            emptyHint="No FAQs yet. Short questions with direct answers help AI search tools quote the post."
+                            questionPlaceholder="e.g. How much gas does a commercial fryer use?"
+                            answerPlaceholder="A direct answer in two or three sentences."
+                        />
                     </Section>
 
                     <Section title="Featured image">
@@ -342,7 +290,7 @@ const BlogEditor = ({ blog, categories = [], onSaved, onCancel }) => {
                             <div className="flex-1 space-y-4">
                                 <div>
                                     <label htmlFor="blog-image" className={labelClass}>{image ? 'Replace image' : 'Image file'}</label>
-                                    <input id="blog-image" type="file" accept={IMAGE_TYPES.join(',')} onChange={chooseImage} className={`${inputClass} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-accent file:text-secondary hover:file:bg-white cursor-pointer`} />
+                                    <input id="blog-image" type="file" accept={IMAGE_TYPES.join(',')} onChange={chooseImage} className={fileInputClass} />
                                     <p className={hintClass}>JPEG, PNG, WebP or AVIF, up to 5 MB. Landscape images around 1600 px wide work best.</p>
                                     {imageError && <p role="alert" className="text-sm text-red-300 mt-2">{imageError}</p>}
                                 </div>
@@ -406,14 +354,7 @@ const BlogEditor = ({ blog, categories = [], onSaved, onCancel }) => {
                         </div>
                     </Section>
 
-                    {serverErrors.length > 0 && (
-                        <div role="alert" className="rounded-xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-200">
-                            <p className="font-bold mb-2">The post was not saved:</p>
-                            <ul className="list-disc pl-5 space-y-1">
-                                {serverErrors.map((message) => <li key={message}>{message}</li>)}
-                            </ul>
-                        </div>
-                    )}
+                    <ErrorList title="The post was not saved:" errors={serverErrors} />
 
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4">
                         <div className="flex flex-wrap gap-3">
@@ -446,7 +387,7 @@ const BlogEditor = ({ blog, categories = [], onSaved, onCancel }) => {
                 </form>
 
                 <aside className="lg:sticky lg:top-6 bg-secondary/20 border border-white/5 rounded-2xl p-6" aria-label="SEO">
-                    <SeoPanel post={post} />
+                    <SeoPanel title={blogSeoTitle(post)} url={`${SITE}/blog/${post.slug || 'your-post-url'}`} description={blogDescription(post)} checks={checks} />
                 </aside>
             </div>
 

@@ -30,6 +30,11 @@ async function loadRuntime() {
     return renderer;
 }
 
+// The bundled catalogue and posts the renderer falls back to without a database.
+async function loadFallbackData() {
+    return (await loadRuntime()).fallbackData;
+}
+
 function invalidateContent(req, res, next) {
     res.on('finish', () => {
         if (loader && !['GET', 'HEAD'].includes(req.method) && res.statusCode < 400) loader.invalidate();
@@ -87,4 +92,4 @@ function mountWeb(app, dist) {
     });
 }
 
-module.exports = { mountWeb, invalidateContent };
+module.exports = { mountWeb, invalidateContent, loadFallbackData };

@@ -1,6 +1,7 @@
 import defaultProducts from '../data/productsData.js';
 import defaultBlogs from '../data/blogsData.js';
 import { blogDescription, blogSeoTitle, bodyOf, bodyToText, wordCount } from './blog-content.js';
+import { categoryProducts, findProduct, productPath } from './catalogue.js';
 
 export const SITE_URL = 'https://aksales.in';
 const DEFAULT_IMAGE = `${SITE_URL}/images/ak-sales-logo.png`;
@@ -33,10 +34,6 @@ function pathOnly(value) {
     let path;
     try { path = new URL(input, `${SITE_URL}/`).pathname; } catch { return '/invalid-url'; }
     return path.replace(/\/+$/, '') || '/';
-}
-
-export function productPath(categorySlug, productName) {
-    return `/collections/${encode(categorySlug)}/${encode(productName)}`;
 }
 
 const staticPages = {
@@ -79,10 +76,7 @@ function missingPage(path) {
 }
 
 const validSegment = (value) => typeof value === 'string' && value.trim() && value !== '.' && value !== '..';
-
-function validProducts(category) {
-    return Array.isArray(category?.products) ? category.products.filter((product) => validSegment(product?.name)) : [];
-}
+const isPublicCategory = (key, category) => validSegment(key) && Boolean(plainText(category?.title));
 
 // Database timestamps arrive as Date objects during SSR and as ISO strings
 // after JSON. Anything that is not a real instant is dropped, never guessed.
@@ -102,8 +96,8 @@ function absoluteUrl(value) {
     } catch { return undefined; }
 }
 
-function faqSchema(blog, canonical) {
-    const questions = (Array.isArray(blog.faqs) ? blog.faqs : [])
+function faqSchema(item, canonical) {
+    const questions = (Array.isArray(item?.faqs) ? item.faqs : [])
         .map((faq) => [plainText(faq?.question), plainText(faq?.answer)])
         .filter(([question, answer]) => question && answer);
     if (!questions.length) return null;
@@ -143,28 +137,48 @@ export function getPageInfo(pathname, { products = defaultProducts, blogs = defa
     const segments = path.split('/').slice(1).map(decode);
     if (segments.some((segment) => segment === null)) return missingPage(path);
     if (segments[0] === 'collections' && (segments.length === 2 || segments.length === 3)) {
-        const key = segments[1];
+        // A product URL may name an old category or an old name; findProduct
+        // returns where it lives now, and that becomes the canonical.
+        const found = segments.length === 3 && products ? findProduct(products, segments[1], segments[2]) : null;
+        if (segments.length === 3 && !found) return missingPage(path);
+        const key = found ? found.categoryKey : segments[1];
         const category = products && Object.hasOwn(products, key) ? products[key] : null;
-        if (!validSegment(key) || !category || !plainText(category.title)) return missingPage(path);
-        const items = validProducts(category);
+        if (!isPublicCategory(key, category)) return missingPage(path);
+        const items = categoryProducts(category);
         const categoryPath = `/collections/${encode(key)}`;
         const categoryTitle = plainText(category.title);
         const crumbs = [['Home', '/'], ['Collections', '/collections'], [categoryTitle, categoryPath]];
-        if (segments.length === 2) {
-            const info = page(categoryPath, `${categoryTitle} Equipment | AK Sales Surat`, `Explore ${categoryTitle.toLowerCase()} equipment from AK Sales in Surat. Compare commercial kitchen products and contact our team for specifications and a quote.`, { noindex: items.length === 0, image: safeImage(items[0]?.image) });
+        if (!found) {
+            const info = page(categoryPath,
+                plainText(category.seoTitle) || `${categoryTitle} Equipment | AK Sales Surat`,
+                plainText(category.metaDescription) || `Explore ${categoryTitle.toLowerCase()} equipment from AK Sales in Surat. Compare commercial kitchen products and contact our team for specifications and a quote.`,
+                { noindex: items.length === 0, image: safeImage(items[0]?.image) });
             info.schemas.push(breadcrumb(crumbs));
+            const faq = faqSchema(category, info.canonical);
+            if (faq) info.schemas.push(faq);
             return info;
         }
-        const product = items.find((item) => item.name.toLowerCase() === segments[2].toLowerCase());
-        if (!product) return missingPage(path);
-        const canonicalPath = productPath(key, product.name);
+        const { product } = found;
+        const canonicalPath = productPath(key, product);
         const productName = plainText(product.name);
-        const info = page(canonicalPath, `${productName} in Surat | AK Sales`, `${productName} from AK Sales in Surat. Explore our ${categoryTitle.toLowerCase()} catalogue and contact us for commercial kitchen specifications and a quote.`, { image: safeImage(product.image) });
-        info.schemas.push(breadcrumb([...crumbs, [productName, canonicalPath]]), {
+        const info = page(canonicalPath,
+            plainText(product.seoTitle) || `${productName} in Surat | AK Sales`,
+            plainText(product.metaDescription) || plainText(product.summary) || `${productName} from AK Sales in Surat. Explore our ${categoryTitle.toLowerCase()} catalogue and contact us for commercial kitchen specifications and a quote.`,
+            { image: safeImage(product.image), imageAlt: plainText(product.imageAlt) || productName });
+        const gallery = (Array.isArray(product.gallery) ? product.gallery : []).map((item) => absoluteUrl(item?.src));
+        const schema = {
             '@context': 'https://schema.org', '@type': 'Product', '@id': `${info.canonical}#product`, name: productName,
-            url: info.canonical, image: info.image, description: info.description, category: categoryTitle,
-            manufacturer: { '@id': BUSINESS_ID },
-        });
+            url: info.canonical, image: [...new Set([info.image, ...gallery.filter(Boolean)])], description: info.description,
+            category: categoryTitle, brand: { '@type': 'Brand', name: 'AK Sales' }, manufacturer: { '@id': BUSINESS_ID },
+        };
+        if (plainText(product.modelNumber)) schema.sku = plainText(product.modelNumber);
+        const specs = (Array.isArray(product.specs) ? product.specs : [])
+            .map((spec) => [plainText(spec?.label), plainText(spec?.value)])
+            .filter(([label, value]) => label && value);
+        if (specs.length) schema.additionalProperty = specs.map(([name, value]) => ({ '@type': 'PropertyValue', name, value }));
+        info.schemas.push(breadcrumb([...crumbs, [productName, canonicalPath]]), schema);
+        const faq = faqSchema(product, info.canonical);
+        if (faq) info.schemas.push(faq);
         return info;
     }
     if (segments[0] === 'blog' && segments.length === 2) {
@@ -206,16 +220,21 @@ export function getPageInfo(pathname, { products = defaultProducts, blogs = defa
 }
 
 export function sitemapXml({ products = defaultProducts, blogs = defaultBlogs } = {}) {
-    // path -> lastmod. Only blogs carry a lastmod, and only from a real update time.
+    // path -> lastmod. A lastmod is written only from a real update time.
+    const day = (value) => isoDate(value)?.slice(0, 10);
     const paths = new Map(Object.keys(staticPages).map((path) => [path, undefined]));
     for (const [key, category] of Object.entries(products || {})) {
-        const items = validProducts(category);
-        if (!validSegment(key) || !plainText(category?.title) || items.length === 0) continue;
-        paths.set(`/collections/${encode(key)}`, undefined);
-        items.forEach((product) => paths.set(productPath(key, product.name), undefined));
+        const items = categoryProducts(category);
+        if (!isPublicCategory(key, category) || items.length === 0) continue;
+        paths.set(`/collections/${encode(key)}`, day(category.updatedAt));
+        items.forEach((product) => {
+            // The first product with a slug wins, as in findProduct.
+            const path = productPath(key, product);
+            if (!paths.has(path)) paths.set(path, day(product.updatedAt));
+        });
     }
     for (const blog of Array.isArray(blogs) ? blogs : []) {
-        if (isPublicBlog(blog)) paths.set(`/blog/${encode(blog.slug)}`, isoDate(blog.updatedAt)?.slice(0, 10));
+        if (isPublicBlog(blog)) paths.set(`/blog/${encode(blog.slug)}`, day(blog.updatedAt));
     }
     const entry = ([path, lastmod]) => `  <url><loc>${xmlEscape(`${SITE_URL}${path}`)}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`;
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...paths].map(entry).join('\n')}\n</urlset>\n`;

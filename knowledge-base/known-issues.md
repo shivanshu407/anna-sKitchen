@@ -302,3 +302,13 @@ covered by Image, auto-scroll and main tests. Lighthouse is a lab check, not det
 **Workaround**: Use "Save draft" often; drafts are hidden from the public site.
 **Fix**:
 **Regression Test**: None yet.
+
+## ISSUE-019: Every page embeds the full catalogue and blog bodies
+**Status**: Open
+**Severity**: Low
+**Discovered**: 2026-10-27
+**Symptom**: The SSR bootstrap (`<script id="site-data">`) carries every category, product and blog, now including rich descriptions, specs and FAQs, on every page. As the owner writes descriptions it will grow and add download/parse time, mainly on mobile.
+**Root Cause**: `SiteDataProvider` shares one snapshot with all routes (rendering.md); per-route data was out of scope.
+**Workaround**: None needed at current size. Watch the HTML size of the home page after adding descriptions.
+**Fix**:
+**Regression Test**: None yet.

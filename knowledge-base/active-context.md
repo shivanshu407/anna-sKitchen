@@ -1,10 +1,12 @@
 ## Current Status
 **Last Updated**: 2026-10-27
-**Last Agent Session**: Built the SEO/AEO-ready blog editor (TipTap), drafts, preview, editing, structured blog rendering and metadata (see blog.md and changelog). Committed on branch `blog-seo-editor` together with the earlier uncommitted SEO release work; not merged to main, pushed or deployed.
-**Test Suite Status**: `npm test` 341/341 across 22 files, both builds pass (one run hit ISSUE-013, re-run green). Lint 0 errors, 1 pre-existing warning. Browser-verified locally without a database; Cloudinary uploads and Atlas saves not verified.
+**Last Agent Session**: Built the SEO/AEO-ready blog editor (commit 83bea2e, merged to main and pushed to github.com/shivanshu407/anna-sKitchen, not deployed). Then added catalogue editing: product/category editors with SEO fields, slug URLs for all products with 301s, and the built-in blog import (see catalogue.md); committed on main and pushed, not deployed.
+**Test Suite Status**: `npm test` 455/455 across 29 files, both builds pass (one ISSUE-013 setup flake, re-runs green). Lint 0 errors, 1 pre-existing warning. Browser-verified locally without a database; Cloudinary, Atlas writes and blog import not verified.
 
 ## In Progress (blog editor, 2026-10-27)
-- [ ] Merge `blog-seo-editor` into main and deploy the release; the owner then publishes a test draft on production to confirm Cloudinary upload and Atlas save.
+- [ ] Deploy main from github.com/shivanshu407/anna-sKitchen (check which repo hPanel is connected to).
+- [ ] After deploy: Manage Blogs → "Import built-in posts" once; edit one product to confirm Cloudinary upload and Atlas save; spot-check an old product URL returns 301 to its slug URL; resubmit the sitemap in Search Console.
+- [ ] Deploy the release; the owner then publishes a test draft on production to confirm Cloudinary upload and Atlas save.
 - [ ] After deploy: run Google's Rich Results Test / Schema validator on a live post and check sitemap `lastmod`.
 - [ ] Optional: unsaved-changes prompt in the editor (ISSUE-018).
 

@@ -12,6 +12,33 @@ describe('server catalogue snapshots', () => {
         });
         expect(toCatalogue([])).toEqual({});
     });
+    it('passes the SEO fields through and leaves out the ones a product does not have', () => {
+        const updatedAt = new Date('2026-10-01T00:00:00Z');
+        const body = { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Guide' }] }] };
+        const rich = {
+            name: 'Dosa Bhatti', slug: 'dosa-bhatti', oldSlugs: ['dosa-plate'], image: '/dosa.webp', imageAlt: 'A dosa bhatti',
+            imageWidth: 800, imageHeight: 600, gallery: [{ src: '/side.webp', alt: 'Side view' }], summary: 'Flat griddle.',
+            body, specs: [{ label: 'Burners', value: '2' }], faqs: [{ question: 'Gas?', answer: 'LPG or PNG.' }],
+            seoTitle: 'Dosa Bhatti', metaDescription: 'A griddle.', focusKeyword: 'dosa bhatti', modelNumber: 'DB-2', updatedAt,
+        };
+        const publicCategory = {
+            slug: 'heating-range', title: 'Heating Range', description: 'Ranges', seoTitle: 'Ranges in Surat',
+            metaDescription: 'Ranges', body, faqs: [{ question: 'Q', answer: 'A' }], updatedAt,
+        };
+        const stored = {
+            ...publicCategory, _id: 'c', createdAt: updatedAt, __v: 0,
+            products: [{ ...rich, _id: 'p' }, { name: 'Tawa', image: '/tawa.webp', extra: 'not public' }],
+        };
+        expect(toCatalogue([stored])).toEqual({
+            'heating-range': { ...publicCategory, products: [rich, { name: 'Tawa', image: '/tawa.webp' }] },
+        });
+    });
+    it('reads Mongoose documents the same way as lean ones, so legacy items stay { name, image }', async () => {
+        const { createRequire } = await import('node:module');
+        const Category = createRequire(import.meta.url)('./models/Product.js');
+        const doc = new Category({ slug: 'custom', title: 'Custom', products: [{ name: 'Range', image: '/range.webp' }] });
+        expect(toCatalogue([doc]).custom).toEqual({ slug: 'custom', title: 'Custom', description: '', products: [{ name: 'Range', image: '/range.webp' }] });
+    });
     it('uses bundled content immediately when the database is disconnected', async () => {
         const read = vi.fn();
         const loader = createContentLoader({ fallback, isConnected: () => false, read });

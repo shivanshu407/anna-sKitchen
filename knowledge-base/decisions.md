@@ -268,3 +268,21 @@ JSON-LD whose text matches the page.
 **Alternatives Considered**: Dropping FAQ schema (loses a harmless machine-readable signal);
 FAQ schema without visible content (violates structured-data guidelines).
 **Consequences**: No Google stars should be expected; the value is extractable answers.
+
+## Decision: Products move to clean slug URLs with automatic 301s
+**Date**: 2026-10-27
+**Status**: Accepted (chosen by the owner)
+**Supersedes**: the "keep encoded product-name URLs" part of the 2026-10-02 SEO decision.
+**Context**: Product URLs were the URL-encoded product name (e.g. `/collections/heating-range/Three%20Burner%20Chinese%20Gas`).
+Renaming a product broke its URL, encoded spaces read poorly, and the owner wanted custom
+slugs. 61 live products had no slug field and no slug collisions when derived from names.
+**Decision**: Every product's canonical URL is `/collections/<category>/<slug>`, where the
+slug is the stored `slug` or `slugify(name)` for products saved before slugs existed
+(`src/lib/catalogue.js`). `findProduct` also resolves legacy name URLs, `oldSlugs` (kept
+when a slug changes) and products moved to another category; `server/web.js` turns any
+non-canonical match into a 301. Slugs are unique across the whole catalogue.
+**Alternatives Considered**: Slugs only for new/edited products (mixed URL styles for a
+long time); slug changes without redirects (lost links).
+**Consequences**: All existing product URLs 301 once to their slug URL right after the
+domain move; Google consolidates them. Category slugs stay immutable. The CommonJS
+server mirrors `productSlug` in `server/catalogue-input.js`; a test keeps them in sync.

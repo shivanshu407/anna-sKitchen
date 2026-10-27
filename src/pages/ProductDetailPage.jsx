@@ -1,11 +1,20 @@
+import React from 'react';
 import Image from '../components/Image';
 import { useParams, Link } from 'react-router-dom';
 import { FaHome, FaChevronRight, FaArrowRight } from 'react-icons/fa';
 import CTA from '../components/CTA';
 import ClientSlider from '../components/ClientSlider';
 import PartnerSlider from '../components/PartnerSlider';
+import BlogContent from '../components/BlogContent';
 import { useSiteData } from '../lib/site-data';
+import { findProduct } from '../lib/catalogue';
+import { cloudinarySrcSet } from '../lib/blog-content';
 import QuoteBar from '../components/QuoteBar';
+
+const MAIN_IMAGE_SIZES = '(max-width: 1024px) 100vw, 720px';
+const GALLERY_SIZES = '(max-width: 640px) 50vw, 240px';
+const hasBody = (body) => body?.type === 'doc' && Array.isArray(body.content) && body.content.length > 0;
+const listOf = (value) => (Array.isArray(value) ? value : []);
 
 const ProductDetailPage = () => {
     const { category, productName } = useParams();
@@ -22,11 +31,10 @@ const ProductDetailPage = () => {
         );
     }
 
-    const categoryData = productsData?.[category];
-    const decodedProductName = productName;
-    const product = categoryData?.products.find(
-        p => p.name.toLowerCase() === decodedProductName.toLowerCase()
-    );
+    const found = findProduct(productsData, category, productName);
+    const categoryKey = found?.categoryKey;
+    const categoryData = found ? productsData[categoryKey] : null;
+    const product = found?.product;
 
     const productCategories = Object.keys(productsData).map(key => ({
         name: productsData[key].title,
@@ -48,6 +56,12 @@ const ProductDetailPage = () => {
             </div>
         );
     }
+
+    const summary = String(product.summary ?? '').trim();
+    const gallery = listOf(product.gallery).filter((item) => typeof item?.src === 'string' && item.src);
+    const specs = listOf(product.specs).filter((spec) => spec?.label?.trim() && spec?.value?.trim());
+    const faqs = listOf(product.faqs).filter((faq) => faq?.question?.trim() && faq?.answer?.trim());
+    const mainSrcSet = cloudinarySrcSet(product.image);
 
     return (
         <div className="min-h-screen bg-gold-light">
@@ -77,7 +91,7 @@ const ProductDetailPage = () => {
                             Collections
                         </Link>
                         <FaChevronRight className="text-xs text-white/40" />
-                        <Link to={`/collections/${categoryData.slug}`} className="hover:text-primary transition-colors">
+                        <Link to={`/collections/${categoryKey}`} className="hover:text-primary transition-colors">
                             {categoryData.title}
                         </Link>
                         <FaChevronRight className="text-xs text-white/40" />
@@ -120,23 +134,83 @@ const ProductDetailPage = () => {
                                 loading="lazy"
                                 decoding="async"
                                 src={product.image}
-                                alt={product.name}
+                                srcSet={mainSrcSet}
+                                sizes={mainSrcSet ? MAIN_IMAGE_SIZES : undefined}
+                                width={product.imageWidth || undefined}
+                                height={product.imageHeight || undefined}
+                                alt={product.imageAlt || product.name}
                                 className="max-h-[300px] w-auto object-contain drop-shadow-lg"
                             />
                         </div>
 
-                        {/* Product Description */}
-                        <div>
-                            <h2 className="text-xl md:text-2xl font-bold text-secondary mb-3">
-                                {product.name} Manufacturers in <span className="text-gray-600 font-normal">Surat</span>
-                            </h2>
-                            <p className="text-gray-500 text-sm leading-relaxed mb-4">
-                                AK Sales is a well-known company in Surat that makes and sells kitchen equipment. One of their top products is the {product.name}. This equipment is special because it combines advanced engineering with high-quality materials, making it a favorite for restaurants, hotels, and catering services.
-                            </p>
-                            <button className="text-[#3b82f6] text-sm font-medium hover:underline">
-                                Read more
-                            </button>
-                        </div>
+                        {gallery.length > 0 && (
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                {gallery.map((item, index) => (
+                                    <figure key={index} className="bg-white border border-gray-100 rounded-lg shadow-sm p-3 flex items-center justify-center">
+                                        <Image
+                                            loading="lazy"
+                                            src={item.src}
+                                            srcSet={cloudinarySrcSet(item.src)}
+                                            sizes={cloudinarySrcSet(item.src) ? GALLERY_SIZES : undefined}
+                                            width={item.width || undefined}
+                                            height={item.height || undefined}
+                                            alt={item.alt || product.name}
+                                            className="max-h-40 w-auto object-contain"
+                                        />
+                                    </figure>
+                                ))}
+                            </div>
+                        )}
+
+                        {summary && (
+                            <p className="text-secondary text-base md:text-lg leading-relaxed">{summary}</p>
+                        )}
+
+                        {specs.length > 0 && (
+                            <section>
+                                <h2 className="text-xl md:text-2xl font-bold text-secondary font-heading mb-4">Specifications</h2>
+                                <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+                                    <table className="w-full text-sm text-left border-collapse">
+                                        <tbody>
+                                            {specs.map((spec, index) => (
+                                                <tr key={index} className="border-b border-gray-100 last:border-b-0">
+                                                    <th scope="row" className="px-4 py-3 font-semibold text-secondary align-top w-1/3">{spec.label}</th>
+                                                    <td className="px-4 py-3 text-gray-600 align-top">{spec.value}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        )}
+
+                        {hasBody(product.body) && <BlogContent body={product.body} />}
+
+                        {faqs.length > 0 && (
+                            <section>
+                                <h2 className="text-xl md:text-2xl font-bold text-secondary font-heading mb-6">Frequently asked questions</h2>
+                                <div className="space-y-4">
+                                    {faqs.map((faq, index) => (
+                                        <div key={index} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                                            <h3 className="text-base md:text-lg font-bold text-secondary font-heading mb-2">{faq.question}</h3>
+                                            <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Templated description, kept for products with no written content yet */}
+                        {!summary && !hasBody(product.body) && (
+                            <div>
+                                <h2 className="text-xl md:text-2xl font-bold text-secondary mb-3">
+                                    {product.name} Manufacturers in <span className="text-gray-600 font-normal">Surat</span>
+                                </h2>
+                                <p className="text-gray-500 text-sm leading-relaxed mb-4">
+                                    AK Sales is a well-known company in Surat that makes and sells kitchen equipment. One of their top products is the {product.name}. This equipment is special because it combines advanced engineering with high-quality materials, making it a favorite for restaurants, hotels, and catering services.
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Right - Category Sidebar (Takes up 1 col) */}

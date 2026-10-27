@@ -42,6 +42,11 @@ Never stored anywhere in plaintext. `ADMIN_PASSWORD_HASH` holds a scrypt hash
   anchors (no `javascript:`, `//host` or `/\host`), images to Cloudinary or site paths,
   with size and depth caps. Pages render the JSON through React, never as HTML.
 - **Blog uploads are limited**: JPEG/PNG/WebP/AVIF, 5 MB, one file per request.
+- **Catalogue writes (2026-10-27)**: `PUT`/`DELETE /api/products/:categorySlug/:productSlug`
+  (delete is now by slug, not index), `PUT /api/products/categories/:categorySlug`,
+  `POST /api/products/images` and `POST /api/blogs/import-bundled` all carry
+  `requireAuth` before multer. Uploads share `server/uploads.js` limits; product input is
+  sanitized by `server/catalogue-input.js` with the same body allowlist as blogs.
 - **`requireAuth` runs before multer**, so an unauthenticated upload is rejected before the
   file is buffered into memory. Keep that order when adding upload routes.
 - **It fails closed.** If `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH` or `SESSION_SECRET` is

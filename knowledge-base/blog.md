@@ -50,8 +50,12 @@ replacing a single textarea that stored a whole post as one heading/text section
 - TipTap keeps an empty trailing paragraph; the renderer skips empty paragraphs.
 - Google removed FAQ rich results in May 2026; FAQ markup is kept for answer engines
   (see decisions.md). No stars should be expected.
-- Admin list without a database shows an inline load error; the bundled fallback posts are
-  not editable because they are not in MongoDB.
+- Production MongoDB had **0 blogs** on 2026-10-27; the public posts are the bundled
+  `src/data/blogsData.js`. The admin shows them as "Built-in, read-only" with one
+  "Import built-in posts" button (`POST /api/blogs/import-bundled`), which inserts every
+  missing bundled post at once (published, alt = title, `publishedAt` from the display
+  date). Import all at once: as soon as MongoDB holds any blog, the public site shows only
+  database posts. Without a database the admin shows a load error and no import.
 - No unsaved-changes prompt: switching tabs or Cancel discards editor work.
 - Cloudinary upload and real MongoDB saves are not covered by automated tests.
 
